@@ -29,6 +29,9 @@ class PersistentMetaclass(type):
 
         attrs['__cormoran_fields__'] = cormoran_fields
 
+        if not '__cormoran_name__' in attrs:
+            attrs['__cormoran_name__'] = name.lower()
+
         return super(PersistentMetaclass, cls).__new__(cls, name, bases, attrs)
 
 

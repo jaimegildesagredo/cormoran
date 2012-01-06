@@ -40,6 +40,16 @@ class TestPersistent(unittest.TestCase):
             'other': self.persistent_class.other
         }))
 
+    def test_default_cormoran_name_is_lowercase_class_name(self):
+        assert_that(self.persistent_class.__cormoran_name__,
+            is_(self.persistent_class.__name__.lower()))
+
+    def test_set_cormoran_name_overwrites_default(self):
+        class PersistentClass(Persistent):
+            __cormoran_name__ = 'test'
+
+        assert_that(PersistentClass.__cormoran_name__, is_('test'))
+
     def setUp(self):
         class PersistentClass(Persistent):
             field = StringField(name='field_name')
