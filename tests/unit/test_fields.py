@@ -24,14 +24,36 @@ from nose.tools import assert_raises
 from cormoran.fields import BaseField, FieldError
 
 
+class CustomField(BaseField):
+    pass
+
+
 class TestBaseField(unittest.TestCase):
     def test_instantiate_raises_field_error(self):
         with assert_raises(FieldError):
             BaseField()
 
     def test_instantiate_subclass_is_ok(self):
-        class CustomField(BaseField):
-            pass
-
         CustomField()
+
+    def test_get_from_class_returns_field(self):
+        assert_that(self.cls.field, is_(self.field))
+
+    def test_get_from_instance_returns_default_value(self):
+        assert_that(self.cls().field, is_(self.field.default))
+
+    def test_get_from_instance_returns_stored_value(self):
+        instance = self.cls()
+        instance.field = u'test'
+
+        assert_that(instance.field, is_(u'test'))
+        assert_that(self.cls.field, is_(self.field))
+
+    def setUp(self):
+        self.field = CustomField()
+
+        class Cls(object):
+            field = self.field
+
+        self.cls = Cls
 
