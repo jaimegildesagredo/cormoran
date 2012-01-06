@@ -23,3 +23,6 @@ class Persistence(object):
 
     def transaction(self):
         return self._transaction
+
+    def begin_transaction(self):
+        raise NotImplementedError()

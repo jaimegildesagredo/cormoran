@@ -19,6 +19,7 @@
 
 import unittest
 from hamcrest import *
+from nose.tools import assert_raises
 
 from cormoran.persistence import Persistence
 
@@ -32,4 +33,8 @@ class TestPersistence(unittest.TestCase):
         persistence._transaction = True
 
         assert_that(persistence.transaction(), is_(persistence._transaction))
+
+    def test_begin_transaction_is_not_implemented(self):
+        with assert_raises(NotImplementedError):
+            Persistence().begin_transaction()
 
