@@ -35,14 +35,14 @@ class TestStore(unittest.TestCase):
         assert_that(self.store.new, contains(self.persistent))
 
     def test_flush_begins_persistence_transaction_if_not_already_begun(self):
-        when(self.persistence.in_transaction).then_return(False)
+        when(self.persistence.transaction).then_return(False)
 
         self.store.flush()
 
         assert_that_method(self.persistence.begin_transaction).was_called()
 
     def test_flush_doesnt_begin_persistence_transaction_is_already_begun(self):
-        when(self.persistence.in_transaction).then_return(True)
+        when(self.persistence.transaction).then_return(True)
 
         self.store.flush()
 

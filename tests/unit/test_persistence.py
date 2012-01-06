@@ -17,17 +17,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-class Store(object):
-    def __init__(self, persistence):
-        self.persistence = persistence
-        self.new = set()
+import unittest
+from hamcrest import *
 
-    def add(self, persistent):
-        self.new.add(persistent)
+from cormoran.persistence import Persistence
 
-    def flush(self):
-        if not self.persistence.transaction():
-            self.persistence.begin_transaction()
 
-        for persistent in self.new:
-            self.persistence.insert(persistent)
+class TestPersistence(unittest.TestCase):
+    def test_transaction_default_is_false(self):
+        assert_that(Persistence().transaction(), is_(False))
+
+    def test_transaction_returns_protected_variable_value(self):
+        persistence = Persistence()
+        persistence._transaction = True
+
+        assert_that(persistence.transaction(), is_(persistence._transaction))
+

@@ -17,17 +17,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-class Store(object):
-    def __init__(self, persistence):
-        self.persistence = persistence
-        self.new = set()
+class Persistence(object):
+    def __init__(self):
+        self._transaction = False
 
-    def add(self, persistent):
-        self.new.add(persistent)
-
-    def flush(self):
-        if not self.persistence.transaction():
-            self.persistence.begin_transaction()
-
-        for persistent in self.new:
-            self.persistence.insert(persistent)
+    def transaction(self):
+        return self._transaction
