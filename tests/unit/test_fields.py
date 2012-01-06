@@ -17,17 +17,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-class FieldError(Exception):
-    pass
+import unittest
+from hamcrest import *
+from nose.tools import assert_raises
+
+from cormoran.fields import BaseField, FieldError
 
 
-class BaseField(object):
-    def __init__(self, name=None):
-        if self.__class__ is BaseField:
-            raise FieldError()
-        self.name = name
+class TestBaseField(unittest.TestCase):
+    def test_instantiate_raises_field_error(self):
+        with assert_raises(FieldError):
+            BaseField()
 
+    def test_instantiate_subclass_is_ok(self):
+        class CustomField(BaseField):
+            pass
 
-class StringField(BaseField):
-    pass
+        CustomField()
 
