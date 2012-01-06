@@ -26,22 +26,24 @@ from cormoran.fields import StringField
 
 class TestPersistent(unittest.TestCase):
     def test_sets_field_name_if_not_already_setted(self):
-        class User(Persistent):
-            login = StringField()
+        class PersistentClass(Persistent):
+            field = StringField()
 
-        assert_that(User.login.name, is_('login'))
+        assert_that(PersistentClass.field.name, is_('field'))
 
     def test_doesnt_set_field_name_if_already_setted(self):
-        assert_that(self.User.login.name, is_('user_login'))
+        assert_that(self.persistent_class.field.name, is_('field_name'))
 
     def test_create_fields_dict_with_persistent_fields(self):
-        assert_that(self.User.__cormoran_fields__,
-            has_entries({'login': self.User.login, 'email': self.User.email}))
+        assert_that(self.persistent_class.__cormoran_fields__, has_entries({
+            'field': self.persistent_class.field,
+            'other': self.persistent_class.other
+        }))
 
     def setUp(self):
-        class User(Persistent):
-            login = StringField(name='user_login')
-            email = StringField()
+        class PersistentClass(Persistent):
+            field = StringField(name='field_name')
+            other = StringField()
 
-        self.User = User
+        self.persistent_class = PersistentClass
 
