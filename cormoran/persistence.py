@@ -27,5 +27,8 @@ class Persistence(object):
     def begin_transaction(self):
         raise NotImplementedError()
 
+    def commit_transaction(self):
+        raise NotImplementedError()
+
     def insert(self, persistent):
         raise NotImplementedError()

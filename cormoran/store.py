@@ -31,3 +31,6 @@ class Store(object):
 
         for persistent in self.new:
             self.persistence.insert(persistent)
+
+    def commit(self):
+        self.persistence.commit_transaction()

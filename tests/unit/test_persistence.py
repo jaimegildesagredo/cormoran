@@ -38,6 +38,10 @@ class TestPersistence(unittest.TestCase):
         with assert_raises(NotImplementedError):
             Persistence().begin_transaction()
 
+    def test_commit_transaction_is_not_implemented(self):
+        with assert_raises(NotImplementedError):
+            Persistence().commit_transaction()
+
     def test_insert_is_not_implemented(self):
         with assert_raises(NotImplementedError):
             Persistence().insert(object())

@@ -55,6 +55,11 @@ class TestStore(unittest.TestCase):
 
         assert_that_method(self.persistence.insert).was_called().with_args(self.persistent)
 
+    def test_commit_flush_and_commits_persistence_transaction(self):
+        self.store.commit()
+
+        assert_that_method(self.persistence.commit_transaction).was_called()
+
     def setUp(self):
         self.persistent = empty_stub()
         self.persistence = empty_spy()
