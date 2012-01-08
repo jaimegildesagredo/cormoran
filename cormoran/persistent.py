@@ -19,10 +19,6 @@
 from cormoran.fields import BaseField, IntegerField
 
 
-class PersistentError(Exception):
-    pass
-
-
 class PersistentMetaclass(type):
     def __new__(cls, name, bases, attrs):
         cormoran_fields = {}
@@ -31,8 +27,6 @@ class PersistentMetaclass(type):
         for key, value in attrs.iteritems():
             if isinstance(value, BaseField):
                 if value.primary:
-                    if cormoran_pk:
-                        raise PersistentError()
                     cormoran_pk[key] = value
 
                 value.name = value.name or key
