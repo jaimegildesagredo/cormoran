@@ -26,7 +26,7 @@ from cormoran.sql.expr import Insert
 
 
 class PersistentClass(Persistent):
-    field = StringField()
+    field = StringField(primary=True)
     other = StringField()
 
 

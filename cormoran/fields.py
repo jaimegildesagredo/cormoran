@@ -22,11 +22,12 @@ class FieldError(Exception):
 
 
 class BaseField(object):
-    def __init__(self, name=None, default=None):
+    def __init__(self, name=None, default=None, primary=False):
         if self.__class__ is BaseField:
             raise FieldError()
         self.name = name
         self.default = default
+        self.primary = primary
 
     def __get__(self, instance, owner):
         if instance is None:
@@ -36,5 +37,9 @@ class BaseField(object):
 
 
 class StringField(BaseField):
+    pass
+
+
+class IntegerField(BaseField):
     pass
 

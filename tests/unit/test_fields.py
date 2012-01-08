@@ -49,6 +49,14 @@ class TestBaseField(unittest.TestCase):
         assert_that(instance.field, is_(u'test'))
         assert_that(self.cls.field, is_(self.field))
 
+    def test_primary_is_false_by_default(self):
+        assert_that(self.field.primary, is_(False))
+
+    def test_use_other_value_for_primary(self):
+        self.field = CustomField(primary=True)
+
+        assert_that(self.field.primary)
+
     def setUp(self):
         self.field = CustomField()
 

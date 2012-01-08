@@ -19,9 +19,10 @@
 
 import unittest
 from hamcrest import *
+from nose.tools import assert_raises
 
-from cormoran.persistent import Persistent
-from cormoran.fields import StringField
+from cormoran.persistent import Persistent, PersistentError
+from cormoran.fields import StringField, IntegerField
 
 
 class TestPersistent(unittest.TestCase):
@@ -49,6 +50,29 @@ class TestPersistent(unittest.TestCase):
             __cormoran_name__ = 'test'
 
         assert_that(PersistentClass.__cormoran_name__, is_('test'))
+
+    def test_use_primary_field_sets_cormoran_pk_attribute(self):
+        class PersistentClass(Persistent):
+            field = StringField(primary=True)
+
+        assert_that(PersistentClass.__cormoran_pk__, has_entry(
+            'field', PersistentClass.field))
+
+    def test_use_more_than_one_primary_field_raises_error(self):
+        with assert_raises(PersistentError):
+            class PersistentClass(Persistent):
+                field = StringField(primary=True)
+                other = StringField(primary=True)
+
+    def test_default_primary_key_is_integer_field(self):
+        cormoran_fields = self.persistent_class.__cormoran_fields__
+        cormoran_pk = self.persistent_class.__cormoran_pk__
+
+        assert_that(cormoran_pk, has_entry('_id', instance_of(IntegerField)))
+        assert_that(cormoran_fields, has_entry(
+            '_id', instance_of(IntegerField)
+        ))
+        assert_that(cormoran_pk['_id'].primary)
 
     def setUp(self):
         class PersistentClass(Persistent):

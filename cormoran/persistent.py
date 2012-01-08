@@ -16,18 +16,35 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from cormoran.fields import BaseField
+from cormoran.fields import BaseField, IntegerField
+
+
+class PersistentError(Exception):
+    pass
 
 
 class PersistentMetaclass(type):
     def __new__(cls, name, bases, attrs):
         cormoran_fields = {}
+        cormoran_pk = {}
+
         for key, value in attrs.iteritems():
             if isinstance(value, BaseField):
+                if value.primary:
+                    if cormoran_pk:
+                        raise PersistentError()
+                    cormoran_pk[key] = value
+
                 value.name = value.name or key
                 cormoran_fields[key] = value
 
+        if not cormoran_pk:
+            cormoran_pk['_id'] = IntegerField(name='_id', primary=True)
+            cormoran_fields.update(cormoran_pk)
+            attrs.update(cormoran_pk)
+
         attrs['__cormoran_fields__'] = cormoran_fields
+        attrs['__cormoran_pk__'] = cormoran_pk
 
         if not '__cormoran_name__' in attrs:
             attrs['__cormoran_name__'] = name.lower()
