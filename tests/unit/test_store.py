@@ -56,8 +56,12 @@ class TestStore(unittest.TestCase):
         assert_that_method(self.persistence.insert).was_called().with_args(self.persistent)
 
     def test_commit_flush_and_commits_persistence_transaction(self):
+        # TODO: We should test the call to Store.flush method.
+        self.store.add(self.persistent)
+
         self.store.commit()
 
+        assert_that(self.store.new, is_not(contains(self.persistent)))
         assert_that_method(self.persistence.commit_transaction).was_called()
 
     def setUp(self):

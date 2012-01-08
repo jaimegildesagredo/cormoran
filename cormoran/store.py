@@ -33,4 +33,6 @@ class Store(object):
             self.persistence.insert(persistent)
 
     def commit(self):
+        self.flush()
         self.persistence.commit_transaction()
+        self.new.clear()
