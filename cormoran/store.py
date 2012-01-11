@@ -26,8 +26,7 @@ class Store(object):
         self.new.add(persistent)
 
     def flush(self):
-        if not self.persistence.transaction():
-            self.persistence.begin_transaction()
+        self.persistence.begin_transaction()
 
         for persistent in self.new:
             self.persistence.insert(persistent)

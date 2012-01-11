@@ -18,12 +18,6 @@
 
 
 class Persistence(object):
-    def __init__(self):
-        self._transaction = False
-
-    def transaction(self):
-        return self._transaction
-
     def begin_transaction(self):
         raise NotImplementedError()
 

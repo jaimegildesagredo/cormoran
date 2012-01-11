@@ -25,15 +25,6 @@ from cormoran.persistence import Persistence
 
 
 class TestPersistence(unittest.TestCase):
-    def test_transaction_default_is_false(self):
-        assert_that(Persistence().transaction(), is_(False))
-
-    def test_transaction_returns_protected_variable_value(self):
-        persistence = Persistence()
-        persistence._transaction = True
-
-        assert_that(persistence.transaction(), is_(persistence._transaction))
-
     def test_begin_transaction_is_not_implemented(self):
         with assert_raises(NotImplementedError):
             Persistence().begin_transaction()
