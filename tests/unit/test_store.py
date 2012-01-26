@@ -34,6 +34,16 @@ class TestStore(unittest.TestCase):
         self.store.add(self.persistent)
         assert_that(self.store.new, contains(self.persistent))
 
+    def test_add_various_objects_preserve_order(self):
+        item = empty_stub()
+        another = object()
+
+        self.store.add(item)
+        self.store.add(self.persistent)
+        self.store.add(another)
+
+        assert_that(self.store.new, contains(item, self.persistent, another))
+
     def test_flush_calls_begin_transaction_persistence_method(self):
         self.store.flush()
 

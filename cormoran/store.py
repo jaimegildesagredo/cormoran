@@ -20,10 +20,11 @@
 class Store(object):
     def __init__(self, persistence):
         self.persistence = persistence
-        self.new = set()
+        self.new = list()
 
     def add(self, persistent):
-        self.new.add(persistent)
+        if persistent not in self.new:
+            self.new.append(persistent)
 
     def flush(self):
         self.persistence.begin_transaction()
@@ -34,4 +35,4 @@ class Store(object):
     def commit(self):
         self.flush()
         self.persistence.commit_transaction()
-        self.new.clear()
+        self.new = list()
