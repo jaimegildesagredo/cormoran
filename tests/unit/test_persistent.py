@@ -68,15 +68,22 @@ class TestPersistent(unittest.TestCase):
             'other': PersistentClass.other
         }))
 
-    def test_default_primary_key_is_integer_field(self):
-        cormoran_fields = self.persistent_class.__cormoran_fields__
-        cormoran_pk = self.persistent_class.__cormoran_pk__
+    def test_default_sets_id_integer_primary_field(self):
+        assert_that(self.persistent_class._id, instance_of(IntegerField))
+        assert_that(self.persistent_class._id.primary)
+        assert_that(self.persistent_class.__cormoran_fields__,
+            has_entry('_id', self.persistent_class._id))
+        assert_that(self.persistent_class.__cormoran_pk__,
+            has_entry('_id', self.persistent_class._id))
 
-        assert_that(cormoran_pk, has_entry('_id', instance_of(IntegerField)))
-        assert_that(cormoran_fields, has_entry(
-            '_id', instance_of(IntegerField)
-        ))
-        assert_that(cormoran_pk['_id'].primary)
+    def test_overwrite_default_id_field(self):
+        class PersistentClass(Persistent):
+            _id = StringField()
+
+        assert_that(PersistentClass._id, instance_of(StringField))
+        assert_that(not PersistentClass._id.primary)
+        assert_that(PersistentClass.__cormoran_fields__,
+            has_entry('_id', PersistentClass._id))
 
     def setUp(self):
         class PersistentClass(Persistent):

@@ -24,18 +24,15 @@ class PersistentMetaclass(type):
         cormoran_fields = {}
         cormoran_pk = {}
 
+        if '_id' not in attrs:
+            attrs['_id'] = IntegerField(primary=True)
+
         for key, value in attrs.iteritems():
             if isinstance(value, BaseField):
                 if value.primary:
                     cormoran_pk[key] = value
-
                 value.name = value.name or key
                 cormoran_fields[key] = value
-
-        if not cormoran_pk:
-            cormoran_pk['_id'] = IntegerField(name='_id', primary=True)
-            cormoran_fields.update(cormoran_pk)
-            attrs.update(cormoran_pk)
 
         attrs['__cormoran_fields__'] = cormoran_fields
         attrs['__cormoran_pk__'] = cormoran_pk

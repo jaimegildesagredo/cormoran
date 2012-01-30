@@ -21,11 +21,12 @@ import unittest
 from hamcrest import *
 
 from cormoran.persistent import Persistent
-from cormoran.fields import StringField
+from cormoran.fields import StringField, IntegerField
 from cormoran.sql.expr import Insert
 
 
 class PersistentClass(Persistent):
+    _id = IntegerField(primary=True)
     field = StringField(primary=True)
     other = StringField()
 
@@ -35,18 +36,18 @@ class TestInsert(unittest.TestCase):
         assert_that(self.insert.table, is_(self.persistent.__cormoran_name__))
 
     def test_columns_are_persistent_fields_names(self):
-        assert_that(self.insert.columns, contains('field', 'other'))
+        assert_that(self.insert.columns, contains('field', '_id', 'other'))
 
     def test_values_are_persistent_stored_values(self):
         self.persistent.field = 'test'
+        self.persistent.other = 'other'
 
-        assert_that(self.insert.values, contains('test', None))
+        assert_that(self.insert.values, contains('test', None, 'other'))
 
     def test_str_is_insert_statement(self):
         assert_that(str(self.insert), is_(
-            'INSERT INTO persistentclass (field, other) VALUES (?, ?)'))
+            'INSERT INTO persistentclass (field, _id, other) VALUES (?, ?, ?)'))
 
     def setUp(self):
         self.persistent = PersistentClass()
         self.insert = Insert(self.persistent)
-
