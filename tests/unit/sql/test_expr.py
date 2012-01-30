@@ -48,6 +48,19 @@ class TestInsert(unittest.TestCase):
         assert_that(str(self.insert), is_(
             'INSERT INTO persistentclass (field, _id, other) VALUES (?, ?, ?)'))
 
+    def test_columns_and_values_are_in_same_order(self):
+        self.persistent.field = 'test'
+        self.persistent.other = 'other'
+
+        self.assert_that_in_same_order('field')
+        self.assert_that_in_same_order('other')
+        self.assert_that_in_same_order('_id')
+
+    def assert_that_in_same_order(self, field):
+            assert_that(self.insert.columns.index(field),
+                is_(self.insert.values.index(getattr(self.persistent, field)))
+            )
+
     def setUp(self):
         self.persistent = PersistentClass()
         self.insert = Insert(self.persistent)
