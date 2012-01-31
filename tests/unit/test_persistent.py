@@ -85,6 +85,23 @@ class TestPersistent(unittest.TestCase):
         assert_that(PersistentClass.__cormoran_fields__,
             has_entry('_id', PersistentClass._id))
 
+    def test_subclass_inherits_fields_from_super_class(self):
+        class PersistentSubclass(self.persistent_class):
+            pass
+
+        assert_that(PersistentSubclass.field, is_(self.persistent_class.field))
+        assert_that(PersistentSubclass.__cormoran_fields__,
+            has_entries(self.persistent_class.__cormoran_fields__))
+
+    def test_overwrite_inherited_field_from_super_class(self):
+        class PersistentSubclass(self.persistent_class):
+            _id = StringField()
+
+        assert_that(PersistentSubclass._id, instance_of(StringField))
+        assert_that(PersistentSubclass._id, is_not(self.persistent_class._id))
+        assert_that(PersistentSubclass.__cormoran_fields__,
+            has_entry('_id', PersistentSubclass._id))
+
     def setUp(self):
         class PersistentClass(Persistent):
             field = StringField(name='field_name')

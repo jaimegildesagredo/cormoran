@@ -22,20 +22,22 @@ from cormoran.fields import BaseField, IntegerField
 class PersistentMetaclass(type):
     def __new__(cls, name, bases, attrs):
         cormoran_fields = {}
-        cormoran_pk = {}
 
-        if '_id' not in attrs:
+        for base in bases:
+            if hasattr(base, '__cormoran_fields__'):
+                cormoran_fields.update(base.__cormoran_fields__)
+
+        if '_id' not in attrs and '_id' not in cormoran_fields:
             attrs['_id'] = IntegerField(primary=True)
 
         for key, value in attrs.iteritems():
             if isinstance(value, BaseField):
-                if value.primary:
-                    cormoran_pk[key] = value
                 value.name = value.name or key
                 cormoran_fields[key] = value
 
         attrs['__cormoran_fields__'] = cormoran_fields
-        attrs['__cormoran_pk__'] = cormoran_pk
+        attrs['__cormoran_pk__'] = dict(
+            [x for x in cormoran_fields.iteritems() if x[1].primary])
 
         if not '__cormoran_name__' in attrs:
             attrs['__cormoran_name__'] = name.lower()
