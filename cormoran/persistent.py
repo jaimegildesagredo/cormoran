@@ -48,3 +48,7 @@ class PersistentMetaclass(type):
 class Persistent(object):
     __metaclass__ = PersistentMetaclass
 
+    def __init__(self, **kwargs):
+        for k, v in kwargs.iteritems():
+            setattr(self, k, v)
+

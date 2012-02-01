@@ -102,6 +102,18 @@ class TestPersistent(unittest.TestCase):
         assert_that(PersistentSubclass.__cormoran_fields__,
             has_entry('_id', PersistentSubclass._id))
 
+    def test_instantiate_with_kw_arguments_sets_fields_values(self):
+        persistent = self.persistent_class(field=u'test', other=u'other')
+
+        assert_that(persistent.field, is_(u'test'))
+        assert_that(persistent.other, is_(u'other'))
+
+    def test_instantiate_with_one_kw_argument_sets_these_field_value(self):
+        persistent = self.persistent_class(field=u'test')
+
+        assert_that(persistent.field, is_(u'test'))
+        assert_that(persistent.other, is_(self.persistent_class.other.default))
+
     def setUp(self):
         class PersistentClass(Persistent):
             field = StringField(name='field_name')
