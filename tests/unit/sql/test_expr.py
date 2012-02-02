@@ -22,7 +22,7 @@ from hamcrest import *
 
 from cormoran.persistent import Persistent
 from cormoran.fields import StringField, IntegerField
-from cormoran.sql.expr import Insert
+from cormoran.sql.expr import Insert, Update
 
 
 class PersistentClass(Persistent):
@@ -31,22 +31,12 @@ class PersistentClass(Persistent):
     other = StringField()
 
 
-class TestInsert(unittest.TestCase):
+class _ExprTestCase(unittest.TestCase):
     def test_table_is_persistent_cormoran_name(self):
-        assert_that(self.insert.table, is_(self.persistent.__cormoran_name__))
+        assert_that(self.expr.table, is_(self.persistent.__cormoran_name__))
 
     def test_columns_are_persistent_fields_names(self):
-        assert_that(self.insert.columns, contains('field', '_id', 'other'))
-
-    def test_values_are_persistent_stored_values(self):
-        self.persistent.field = 'test'
-        self.persistent.other = 'other'
-
-        assert_that(self.insert.values, contains('test', None, 'other'))
-
-    def test_str_is_insert_statement(self):
-        assert_that(str(self.insert), is_(
-            'INSERT INTO persistentclass (field, _id, other) VALUES (?, ?, ?)'))
+        assert_that(self.expr.columns, contains('field', '_id', 'other'))
 
     def test_columns_and_values_are_in_same_order(self):
         self.persistent.field = 'test'
@@ -57,10 +47,39 @@ class TestInsert(unittest.TestCase):
         self.assert_that_in_same_order('_id')
 
     def assert_that_in_same_order(self, field):
-            assert_that(self.insert.columns.index(field),
-                is_(self.insert.values.index(getattr(self.persistent, field)))
+            assert_that(self.expr.columns.index(field),
+                is_(self.expr.values.index(getattr(self.persistent, field)))
             )
 
     def setUp(self):
         self.persistent = PersistentClass()
-        self.insert = Insert(self.persistent)
+        self.expr = self.expr_cls(self.persistent)
+
+
+class TestInsert(_ExprTestCase):
+    expr_cls = Insert
+
+    def test_values_are_persistent_stored_values(self):
+        self.persistent.field = 'test'
+        self.persistent.other = 'other'
+
+        assert_that(self.expr.values, contains('test', None, 'other'))
+
+    def test_str_is_insert_statement(self):
+        assert_that(str(self.expr), is_(
+            'INSERT INTO persistentclass (field, _id, other) VALUES (?, ?, ?)'))
+
+
+class TestUpdate(_ExprTestCase):
+    expr_cls = Update
+
+    def test_values_are_persistent_stored_values_and_where_clause_values(self):
+        self.persistent.field = 'test'
+        self.persistent.other = 'other'
+
+        assert_that(self.expr.values, contains('test', None, 'other', 'test', None))
+
+    def test_str_is_update_stattement(self):
+        assert_that(str(self.expr), is_(
+            'UPDATE persistentclass SET field=?, _id=?, other=? WHERE field=? AND _id=?'
+        ))

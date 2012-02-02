@@ -17,19 +17,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-class Insert(object):
+class BaseExpr(object):
     def __init__(self, persistent):
         self._persistent = persistent
         self._fields = persistent.__cormoran_fields__
-
-    def __str__(self):
-        sql = 'INSERT INTO '
-        sql += self.table
-        sql += ' (' + ', '.join(self.columns)
-        sql += ') VALUES (' + ', '.join('?'*len(self.columns))
-        sql += ')'
-
-        return sql
 
     @property
     def table(self):
@@ -43,3 +34,38 @@ class Insert(object):
     def values(self):
         return [getattr(self._persistent, x) for x in self._fields]
 
+
+class Insert(BaseExpr):
+
+    def __str__(self):
+        sql = 'INSERT INTO '
+        sql += self.table
+        sql += ' (' + ', '.join(self.columns)
+        sql += ') VALUES (' + ', '.join('?'*len(self.columns))
+        sql += ')'
+
+        return sql
+
+
+class Update(BaseExpr):
+    """UPDATE T SET C1 = 1 WHERE C2 = 'a'"""
+
+    def __init__(self, persistent):
+        super(Update, self).__init__(persistent)
+        self._pk = persistent.__cormoran_pk__
+
+    @property
+    def values(self):
+        values = super(Update, self).values
+        values.extend([getattr(self._persistent, x) for x in self._pk])
+        return values
+
+    def __str__(self):
+        sql = 'UPDATE '
+        sql += self.table
+        sql += ' SET '
+        sql += ', '.join(['%s=?' % x.name for x in self._fields.itervalues()])
+        sql += ' WHERE '
+        sql += ' AND '.join(['%s=?' % x.name for x in self._pk.itervalues()])
+
+        return sql
