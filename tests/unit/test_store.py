@@ -20,8 +20,10 @@
 import unittest
 from hamcrest import *
 from pyDoubles.framework import *
+from nose.tools import assert_raises
 
 from cormoran.store import Store
+from cormoran.persistent import Persistent
 
 
 class TestStore(unittest.TestCase):
@@ -43,6 +45,34 @@ class TestStore(unittest.TestCase):
         self.store.add(another)
 
         assert_that(self.store.new, contains(item, self.persistent, another))
+
+    def test_delete_persisted_object_adds_it_to_deleted(self):
+        self.store.delete(self.persistent)
+        assert_that(self.store.deleted, contains(self.persistent))
+
+    def test_delete_already_deleted_object_doesnt_adds_it(self):
+        self.store.delete(self.persistent)
+        self.store.delete(self.persistent)
+        assert_that(self.store.deleted, contains(self.persistent))
+
+    def test_delete_object_in_new_removes_it_from_new(self):
+        self.store.add(self.persistent)
+        self.store.delete(self.persistent)
+
+        assert_that(self.store.new, is_not(contains(self.persistent)))
+        assert_that(self.store.deleted, is_not(contains(self.persistent)))
+
+    def test_delete_various_objects_preserve_order(self):
+        self.other = PersistentClass()
+
+        self.store.delete(self.persistent)
+        self.store.delete(self.other)
+
+        assert_that(self.store.deleted, contains(self.persistent, self.other))
+
+    def test_delete_no_persistent_subclass_object_raises_type_error(self):
+        with assert_raises(TypeError):
+            self.store.delete(str())
 
     def test_flush_calls_begin_transaction_persistence_method(self):
         self.store.flush()
@@ -66,7 +96,11 @@ class TestStore(unittest.TestCase):
         assert_that_method(self.persistence.commit_transaction).was_called()
 
     def setUp(self):
-        self.persistent = empty_stub()
+        self.persistent = PersistentClass()
         self.persistence = empty_spy()
         self.store = Store(self.persistence)
+
+
+class PersistentClass(Persistent):
+    pass
 

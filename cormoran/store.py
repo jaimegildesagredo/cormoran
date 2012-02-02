@@ -16,15 +16,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from cormoran.persistent import Persistent
+
 
 class Store(object):
     def __init__(self, persistence):
         self.persistence = persistence
         self.new = list()
+        self.deleted = list()
 
     def add(self, persistent):
         if persistent not in self.new:
             self.new.append(persistent)
+
+    def delete(self, persistent):
+        if not isinstance(persistent, Persistent):
+            raise TypeError()
+
+        if persistent in self.new:
+            self.new.remove(persistent)
+        elif persistent not in self.deleted:
+            self.deleted.append(persistent)
 
     def flush(self):
         self.persistence.begin_transaction()
