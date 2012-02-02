@@ -44,6 +44,9 @@ class Store(object):
         for persistent in self.new:
             self.persistence.insert(persistent)
 
+        for persistent in self.deleted:
+            self.persistence.delete(persistent)
+
     def commit(self):
         self.flush()
         self.persistence.commit_transaction()

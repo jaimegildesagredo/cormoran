@@ -86,6 +86,13 @@ class TestStore(unittest.TestCase):
 
         assert_that_method(self.persistence.insert).was_called().with_args(self.persistent)
 
+    def test_flush_deletes_deleted_objects_from_persistence_mechanism(self):
+        self.store.delete(self.persistent)
+
+        self.store.flush()
+
+        assert_that_method(self.persistence.delete).was_called().with_args(self.persistent)
+
     def test_commit_flush_and_commits_persistence_transaction(self):
         # TODO: We should test the call to Store.flush method.
         self.store.add(self.persistent)
