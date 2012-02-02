@@ -77,7 +77,7 @@ class TestUpdate(_ExprTestCase):
 
         assert_that(self.expr.values, contains('test', None, 'other', 'test', None))
 
-    def test_str_is_update_stattement(self):
+    def test_str_is_update_statement(self):
         assert_that(str(self.expr), is_(
             'UPDATE persistentclass SET field=?, _id=?, other=? WHERE field=? AND _id=?'
         ))
