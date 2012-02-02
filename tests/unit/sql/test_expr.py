@@ -22,7 +22,7 @@ from hamcrest import *
 
 from cormoran.persistent import Persistent
 from cormoran.fields import StringField, IntegerField
-from cormoran.sql.expr import Insert, Update
+from cormoran.sql.expr import Insert, Update, Delete
 
 
 class PersistentClass(Persistent):
@@ -40,10 +40,8 @@ class _ExprTestCase(unittest.TestCase):
 
     def test_columns_and_values_are_in_same_order(self):
         self.persistent.field = 'test'
-        self.persistent.other = 'other'
 
         self.assert_that_in_same_order('field')
-        self.assert_that_in_same_order('other')
         self.assert_that_in_same_order('_id')
 
     def assert_that_in_same_order(self, field):
@@ -83,3 +81,17 @@ class TestUpdate(_ExprTestCase):
         assert_that(str(self.expr), is_(
             'UPDATE persistentclass SET field=?, _id=?, other=? WHERE field=? AND _id=?'
         ))
+
+
+class TestDelete(_ExprTestCase):
+    expr_cls = Delete
+
+    def test_values_are_persistent_object_primary_fields_values(self):
+        self.persistent._id = 1
+        self.persistent.field = 'test'
+
+        assert_that(self.expr.values, contains('test', 1))
+
+    def test_str_is_delete_statement(self):
+        assert_that(str(self.expr), is_(
+            'DELETE FROM persistentclass WHERE field=? AND _id=?'))

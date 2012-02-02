@@ -69,3 +69,21 @@ class Update(BaseExpr):
         sql += ' AND '.join(['%s=?' % x.name for x in self._pk.itervalues()])
 
         return sql
+
+
+class Delete(BaseExpr):
+    def __init__(self, persistent):
+        super(Delete, self).__init__(persistent)
+        self._pk = persistent.__cormoran_pk__
+
+    @property
+    def values(self):
+        return [getattr(self._persistent, x) for x in self._pk]
+
+    def __str__(self):
+        sql = 'DELETE FROM '
+        sql += self.table
+        sql += ' WHERE '
+        sql += ' AND '.join(['%s=?' % x.name for x in self._pk.itervalues()])
+
+        return sql
