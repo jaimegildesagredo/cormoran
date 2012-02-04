@@ -52,3 +52,5 @@ class Persistent(object):
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
 
+    def __iter__(self):
+        return ((x, getattr(self, x)) for x in self.__cormoran_fields__)

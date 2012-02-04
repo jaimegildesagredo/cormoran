@@ -114,6 +114,11 @@ class TestPersistent(unittest.TestCase):
         assert_that(persistent.field, is_(u'test'))
         assert_that(persistent.other, is_(self.persistent_class.other.default))
 
+    def test_dict_returns_a_fields_values_dict(self):
+        persistent = self.persistent_class(_id=1, field=u'test', other=u'other')
+        assert_that(dict(persistent),
+            has_entries({u'_id': 1, u'field': u'test', u'other': u'other'}))
+
     def setUp(self):
         class PersistentClass(Persistent):
             field = StringField(name='field_name')
