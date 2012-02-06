@@ -24,6 +24,7 @@ from nose.tools import assert_raises
 
 from cormoran.store import Store
 from cormoran.persistent import Persistent
+from cormoran.fields import StringField
 
 
 class TestStore(unittest.TestCase):
@@ -86,6 +87,24 @@ class TestStore(unittest.TestCase):
 
         assert_that_method(self.persistence.insert).was_called().with_args(self.persistent)
 
+    def test_flush_populates_persisted_objects_integer_primary_fields(self):
+        when(self.persistence.insert).with_args(self.persistent).then_return(1)
+
+        self.store.add(self.persistent)
+        self.store.flush()
+
+        assert_that(self.persistent._id, is_(1))
+        assert_that(self.persistent.field, is_not(1))
+
+    def test_flush_doesnt_populates_already_setted_interger_primary_field(self):
+        when(self.persistence.insert).with_args(self.persistent).then_return(1)
+
+        self.persistent._id = 2
+        self.store.add(self.persistent)
+        self.store.flush()
+
+        assert_that(self.persistent._id, is_(2))
+
     def test_flush_deletes_deleted_objects_from_persistence_mechanism(self):
         self.store.delete(self.persistent)
 
@@ -109,5 +128,4 @@ class TestStore(unittest.TestCase):
 
 
 class PersistentClass(Persistent):
-    pass
-
+    field = StringField(primary=True)

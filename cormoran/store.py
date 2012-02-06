@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from cormoran.persistent import Persistent
+from cormoran.fields import IntegerField
 
 
 class Store(object):
@@ -42,7 +43,10 @@ class Store(object):
         self.persistence.begin_transaction()
 
         for persistent in self.new:
-            self.persistence.insert(persistent)
+            _id = self.persistence.insert(persistent)
+            for name, field in persistent.__cormoran_pk__.iteritems():
+                if isinstance(field, IntegerField):
+                    setattr(persistent, name, getattr(persistent, name) or _id)
 
         for persistent in self.deleted:
             self.persistence.delete(persistent)
