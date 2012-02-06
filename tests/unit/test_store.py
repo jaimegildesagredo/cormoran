@@ -38,8 +38,8 @@ class TestStore(unittest.TestCase):
         assert_that(self.store.new, contains(self.persistent))
 
     def test_add_various_objects_preserve_order(self):
-        item = empty_stub()
-        another = object()
+        item = PersistentClass()
+        another = PersistentClass()
 
         self.store.add(item)
         self.store.add(self.persistent)
@@ -64,12 +64,14 @@ class TestStore(unittest.TestCase):
         assert_that(self.store.deleted, is_not(contains(self.persistent)))
 
     def test_delete_various_objects_preserve_order(self):
-        self.other = PersistentClass()
+        item = PersistentClass()
+        another = PersistentClass()
 
+        self.store.delete(item)
         self.store.delete(self.persistent)
-        self.store.delete(self.other)
+        self.store.delete(another)
 
-        assert_that(self.store.deleted, contains(self.persistent, self.other))
+        assert_that(self.store.deleted, contains(item, self.persistent, another))
 
     def test_delete_no_persistent_subclass_object_raises_type_error(self):
         with assert_raises(TypeError):
