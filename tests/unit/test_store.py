@@ -47,6 +47,10 @@ class TestStore(unittest.TestCase):
 
         assert_that(self.store.new, contains(item, self.persistent, another))
 
+    def test_add_no_persistent_subclass_object_raises_type_error(self):
+        with assert_raises(TypeError):
+            self.store.add(str())
+
     def test_delete_persisted_object_adds_it_to_deleted(self):
         self.store.delete(self.persistent)
         assert_that(self.store.deleted, contains(self.persistent))

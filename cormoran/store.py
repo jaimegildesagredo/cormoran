@@ -27,6 +27,9 @@ class Store(object):
         self.deleted = list()
 
     def add(self, persistent):
+        if not isinstance(persistent, Persistent):
+            raise TypeError()
+
         if persistent not in self.new:
             self.new.append(persistent)
 
