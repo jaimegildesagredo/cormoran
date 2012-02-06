@@ -118,8 +118,21 @@ class TestStore(unittest.TestCase):
 
         self.store.commit()
 
-        assert_that(self.store.new, is_not(contains(self.persistent)))
         assert_that_method(self.persistence.commit_transaction).was_called()
+
+    def test_commit_clears_new_objects_list(self):
+        self.store.add(self.persistent)
+
+        self.store.commit()
+
+        assert_that(self.store.new, is_not(contains(self.persistent)))
+
+    def test_commit_clears_deleted_objects_list(self):
+        self.store.delete(self.persistent)
+
+        self.store.commit()
+
+        assert_that(self.store.deleted, is_not(contains(self.persistent)))
 
     def setUp(self):
         self.persistent = PersistentClass()

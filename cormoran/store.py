@@ -55,3 +55,4 @@ class Store(object):
         self.flush()
         self.persistence.commit_transaction()
         self.new = list()
+        self.deleted = list()
