@@ -19,10 +19,11 @@
 
 import unittest
 from hamcrest import *
+from nose.tools import nottest
 
 from cormoran.persistent import Persistent
 from cormoran.fields import StringField, IntegerField
-from cormoran.sql.expr import Insert, Update, Delete
+from cormoran.sql.expr import Insert, Update, Delete, Select
 
 
 class PersistentClass(Persistent):
@@ -95,3 +96,27 @@ class TestDelete(_ExprTestCase):
     def test_str_is_delete_statement(self):
         assert_that(str(self.expr), is_(
             'DELETE FROM persistentclass WHERE field=? AND _id=?'))
+
+
+class TestSelect(_ExprTestCase):
+    expr_cls = Select
+
+    def test_table_is_persistent_cormoran_name(self):
+        assert_that(self.expr.table, is_(self.persistent.__cormoran_name__))
+
+    @nottest
+    def test_columns_are_persistent_fields_names(self):
+        pass
+
+    def test_columns_are_an_empty_list(self):
+        assert_that(self.expr.columns, has_length(0))
+
+    def test_values_are_an_empty_list(self):
+        assert_that(self.expr.values, has_length(0))
+
+    @nottest
+    def test_columns_and_values_are_in_same_order(self):
+        pass
+
+    def test_str_is_select_statement(self):
+        assert_that(str(self.expr), is_('SELECT * FROM persistentclass'))

@@ -87,3 +87,18 @@ class Delete(BaseExpr):
         sql += ' AND '.join(['%s=?' % x.name for x in self._pk.itervalues()])
 
         return sql
+
+
+class Select(BaseExpr):
+    @property
+    def values(self):
+        return []
+
+    @property
+    def columns(self):
+        return []
+
+    def __str__(self):
+        sql = 'SELECT * FROM '
+        sql += self.table
+        return sql
