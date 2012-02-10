@@ -35,9 +35,12 @@ class PersistentMetaclass(type):
                 value.name = value.name or key
                 cormoran_fields[key] = value
 
+        cormoran_pk = dict(x for x in cormoran_fields.iteritems() if x[1].primary)
+        if len(cormoran_pk) == 0:
+            raise ValueError()
+
         attrs['__cormoran_fields__'] = cormoran_fields
-        attrs['__cormoran_pk__'] = dict(
-            [x for x in cormoran_fields.iteritems() if x[1].primary])
+        attrs['__cormoran_pk__'] = cormoran_pk
 
         if not '__cormoran_name__' in attrs:
             attrs['__cormoran_name__'] = name.lower()

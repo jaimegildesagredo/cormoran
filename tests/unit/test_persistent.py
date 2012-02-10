@@ -68,6 +68,11 @@ class TestPersistent(unittest.TestCase):
             'other': PersistentClass.other
         }))
 
+    def test_without_primary_field_raises_value_error(self):
+        with assert_raises(ValueError):
+            class PersistentClass(Persistent):
+                _id = IntegerField(primary=False)
+
     def test_default_sets_id_integer_primary_field(self):
         assert_that(self.persistent_class._id, instance_of(IntegerField))
         assert_that(self.persistent_class._id.primary)
@@ -79,6 +84,7 @@ class TestPersistent(unittest.TestCase):
     def test_overwrite_default_id_field(self):
         class PersistentClass(Persistent):
             _id = StringField()
+            field = StringField(primary=True)
 
         assert_that(PersistentClass._id, instance_of(StringField))
         assert_that(not PersistentClass._id.primary)
@@ -96,6 +102,7 @@ class TestPersistent(unittest.TestCase):
     def test_overwrite_inherited_field_from_super_class(self):
         class PersistentSubclass(self.persistent_class):
             _id = StringField()
+            field = StringField(primary=True)
 
         assert_that(PersistentSubclass._id, instance_of(StringField))
         assert_that(PersistentSubclass._id, is_not(self.persistent_class._id))
