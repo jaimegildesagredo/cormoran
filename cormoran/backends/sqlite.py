@@ -2,7 +2,7 @@
 
 from cormoran.persistence import Persistence as Persistence_
 from cormoran.fields import IntegerField
-from cormoran.sql.expr import Insert, Update, Delete
+from cormoran.sql.expr import Insert, Update, Delete, Select
 
 import sqlite3 as dbapi2
 
@@ -11,6 +11,7 @@ class Persistence(Persistence_):
     def __init__(self, path):
         if path is not None:
             self._connection = dbapi2.connect(path, isolation_level=None)
+            self._connection.row_factory = dbapi2.Row
         self._transaction = False
 
     def _cursor(self):
@@ -39,3 +40,8 @@ class Persistence(Persistence_):
     def delete(self, persistent):
         delete = Delete(persistent)
         self._cursor().execute(str(delete), delete.values)
+
+    def select(self, persistent_cls):
+        select = Select(persistent_cls)
+        cursor = self._cursor().execute(str(select))
+        return cursor
