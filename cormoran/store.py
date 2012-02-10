@@ -18,6 +18,7 @@
 
 from cormoran.persistent import Persistent
 from cormoran.fields import IntegerField
+from cormoran.resultset import ResultSet
 
 
 class Store(object):
@@ -41,6 +42,14 @@ class Store(object):
             self.new.remove(persistent)
         elif persistent not in self.deleted:
             self.deleted.append(persistent)
+
+    def find(self, persistent_cls):
+        if not issubclass(persistent_cls, Persistent):
+            raise TypeError()
+
+        self.flush()
+
+        return ResultSet(self.persistence, persistent_cls)
 
     def flush(self):
         self.persistence.begin_transaction()

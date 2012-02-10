@@ -25,6 +25,7 @@ from nose.tools import assert_raises
 from cormoran.store import Store
 from cormoran.persistent import Persistent
 from cormoran.fields import StringField
+from cormoran.resultset import ResultSet
 
 
 class TestStore(unittest.TestCase):
@@ -80,6 +81,20 @@ class TestStore(unittest.TestCase):
     def test_delete_no_persistent_subclass_object_raises_type_error(self):
         with assert_raises(TypeError):
             self.store.delete(str())
+
+    def test_find_with_no_persistent_subclass_raises_type_error(self):
+        with assert_raises(TypeError):
+            self.store.find(str)
+
+    def test_find_flush_and_returns_the_resultset_object(self):
+        # TODO: Test that flush method was called.
+
+        result = self.store.find(PersistentClass)
+
+        assert_that(result, instance_of(ResultSet))
+        # Using `is_` matcher doesn't work as expected.
+        assert_that(result._persistent_cls is PersistentClass)
+        assert_that(result._persistence, is_(self.store.persistence))
 
     def test_flush_calls_begin_transaction_persistence_method(self):
         self.store.flush()
