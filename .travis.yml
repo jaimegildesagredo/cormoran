@@ -6,3 +6,4 @@ before_script:
 
 script:
     nosetests tests/unit
+    python setup.py build
