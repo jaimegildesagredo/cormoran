@@ -65,6 +65,9 @@ class Store(object):
                 if isinstance(field, IntegerField):
                     setattr(persistent, name, getattr(persistent, name) or _id)
 
+        for persistent in self.dirty:
+            self.persistence.update(persistent)
+
         for persistent in self.deleted:
             self.persistence.delete(persistent)
 

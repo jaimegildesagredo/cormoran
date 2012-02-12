@@ -149,6 +149,14 @@ class TestStore(unittest.TestCase):
 
         assert_that_method(self.persistence.delete).was_called().with_args(self.persistent)
 
+    def test_flush_updates_dirty_objects_in_persistence_mechanism(self):
+        self.persistent.__cormoran_persisted__ = True
+
+        self.store.add(self.persistent)
+        self.store.flush()
+
+        assert_that_method(self.persistence.update).was_called().with_args(self.persistent)
+
     def test_commit_flush_and_commits_persistence_transaction(self):
         # TODO: We should test the call to Store.flush method.
         self.store.add(self.persistent)
