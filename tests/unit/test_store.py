@@ -52,6 +52,22 @@ class TestStore(unittest.TestCase):
         with assert_raises(TypeError):
             self.store.add(str())
 
+    def test_add_persisted_object_adds_it_to_dirty(self):
+        self.persistent.__cormoran_persisted__ = True
+
+        self.store.add(self.persistent)
+
+        assert_that(self.store.dirty, contains(self.persistent))
+        assert_that(self.store.new, is_not(contains(self.persistent)))
+
+    def test_add_already_added_persisted_object_doesnt_adds_it(self):
+        self.persistent.__cormoran_persisted__ = True
+
+        self.store.add(self.persistent)
+        self.store.add(self.persistent)
+
+        assert_that(self.store.dirty, contains(self.persistent))
+
     def test_delete_persisted_object_adds_it_to_deleted(self):
         self.store.delete(self.persistent)
         assert_that(self.store.deleted, contains(self.persistent))

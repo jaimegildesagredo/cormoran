@@ -126,6 +126,11 @@ class TestPersistent(unittest.TestCase):
         assert_that(dict(persistent),
             has_entries({u'_id': 1, u'field': u'test', u'other': u'other'}))
 
+    def test_persisted_flag_is_false_by_defalt(self):
+        persistent = self.persistent_class()
+
+        assert_that(not persistent.__cormoran_persisted__)
+
     def setUp(self):
         class PersistentClass(Persistent):
             field = StringField(name='field_name')

@@ -25,14 +25,19 @@ class Store(object):
     def __init__(self, persistence):
         self.persistence = persistence
         self.new = list()
+        self.dirty = list()
         self.deleted = list()
 
     def add(self, persistent):
         if not isinstance(persistent, Persistent):
             raise TypeError()
 
-        if persistent not in self.new:
-            self.new.append(persistent)
+        if persistent.__cormoran_persisted__:
+            if persistent not in self.dirty:
+                self.dirty.append(persistent)
+        else:
+            if persistent not in self.new:
+                self.new.append(persistent)
 
     def delete(self, persistent):
         if not isinstance(persistent, Persistent):

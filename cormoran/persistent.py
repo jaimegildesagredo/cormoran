@@ -51,6 +51,8 @@ class PersistentMetaclass(type):
 class Persistent(object):
     __metaclass__ = PersistentMetaclass
 
+    __cormoran_persisted__ = False
+
     def __init__(self, **kwargs):
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
