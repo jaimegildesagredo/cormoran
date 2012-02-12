@@ -5,5 +5,5 @@ before_script:
     - pip install nose pyhamcrest pydoubles coverage
 
 script:
+    python setup.py develop
     nosetests tests/unit
-    python setup.py build
