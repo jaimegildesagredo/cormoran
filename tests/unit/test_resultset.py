@@ -40,6 +40,16 @@ class TestResultSet(unittest.TestCase):
         assert_that(result[1].field, is_(u'test2'))
         assert_that(result[1]._id, is_(2))
 
+    def test_persistent_objects_have_persisted_flag_to_true(self):
+        persistence = empty_spy()
+
+        when(persistence.select).with_args(PersistentClass).then_return([{u'_id': 1, u'field': u'test1'}])
+
+        result = list(ResultSet(persistence, PersistentClass))
+
+        assert_that(result[0].__cormoran_persisted__)
+
+
 
 class PersistentClass(Persistent):
     field = StringField()

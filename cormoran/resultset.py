@@ -24,4 +24,6 @@ class ResultSet(object):
 
     def __iter__(self):
         for result in self._persistence.select(self._persistent_cls):
-            yield self._persistent_cls(**result)
+            persistent = self._persistent_cls(**result)
+            persistent.__cormoran_persisted__ = True
+            yield persistent
