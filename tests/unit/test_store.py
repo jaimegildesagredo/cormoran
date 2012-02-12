@@ -179,6 +179,14 @@ class TestStore(unittest.TestCase):
 
         assert_that(self.store.deleted, is_not(contains(self.persistent)))
 
+    def test_commit_clears_dirty_objects_list(self):
+        self.persistent.__cormoran_persisted__ = True
+
+        self.store.add(self.persistent)
+        self.store.commit()
+
+        assert_that(self.store.dirty, is_not(contains(self.persistent)))
+
     def setUp(self):
         self.persistent = PersistentClass()
         self.persistence = empty_spy()
