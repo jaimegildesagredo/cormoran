@@ -124,6 +124,13 @@ class TestStore(unittest.TestCase):
 
         assert_that_method(self.persistence.insert).was_called().with_args(self.persistent)
 
+    def test_flush_sets_new_objects_as_persisted(self):
+        self.store.add(self.persistent)
+
+        self.store.flush()
+
+        assert_that(self.persistent.__cormoran_persisted__)
+
     def test_flush_populates_persisted_objects_integer_primary_fields(self):
         when(self.persistence.insert).with_args(self.persistent).then_return(1)
 

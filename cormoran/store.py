@@ -64,6 +64,7 @@ class Store(object):
             for name, field in persistent.__cormoran_pk__.iteritems():
                 if isinstance(field, IntegerField):
                     setattr(persistent, name, getattr(persistent, name) or _id)
+            persistent.__cormoran_persisted__ = True
 
         for persistent in self.dirty:
             self.persistence.update(persistent)
