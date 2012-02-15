@@ -40,3 +40,5 @@ class ResultSet(object):
             if k not in self._persistent_cls.__cormoran_fields__:
                 raise ValueError()
             self._filters[k] = kwargs[k]
+
+        return self

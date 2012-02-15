@@ -66,6 +66,11 @@ class TestResultSet(unittest.TestCase):
         with assert_raises(ValueError):
             self.resultset.filter(inexistent=u'foo')
 
+    def test_filter_returns_the_resultset_object(self):
+        resultset = self.resultset.filter(field=u'test')
+
+        assert_that(resultset, is_(self.resultset))
+
     def result(self):
         return [
             {u'_id': 1, u'field': u'test1'},
