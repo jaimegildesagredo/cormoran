@@ -1,6 +1,6 @@
 language: python
 before_script:
-    - virtualenv cormoran_env
+    - virtualenv --distribute cormoran_env
     - source cormoran_env/bin/activate
     - pip install --use-mirrors nose pyhamcrest pydoubles
 
