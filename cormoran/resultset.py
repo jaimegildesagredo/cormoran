@@ -22,8 +22,21 @@ class ResultSet(object):
         self._persistence = persistence
         self._persistent_cls = persistent_cls
 
+        self._filters = {}
+
     def __iter__(self):
-        for result in self._persistence.select(self._persistent_cls):
+        results = self._persistence.select(
+            self._persistent_cls,
+            filters=self._filters
+        )
+
+        for result in results:
             persistent = self._persistent_cls(**result)
             persistent.__cormoran_persisted__ = True
             yield persistent
+
+    def filter(self, **kwargs):
+        for k in kwargs:
+            if k not in self._persistent_cls.__cormoran_fields__:
+                raise ValueError()
+            self._filters[k] = kwargs[k]

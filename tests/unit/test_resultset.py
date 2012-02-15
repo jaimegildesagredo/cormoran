@@ -20,6 +20,7 @@
 import unittest
 from hamcrest import *
 from pyDoubles.framework import *
+from nose.tools import assert_raises
 
 from cormoran.persistent import Persistent
 from cormoran.fields import StringField
@@ -27,12 +28,10 @@ from cormoran.resultset import ResultSet
 
 
 class TestResultSet(unittest.TestCase):
-    def test_iterate_over_resultset_returns_all(self):
-        persistence = empty_spy()
+    def test_iter_yields_results(self):
+        when(self.persistence.select).then_return(self.result())
 
-        when(persistence.select).with_args(PersistentClass).then_return([{u'_id': 1, u'field': u'test1'}, {u'_id': 2, u'field': u'test2'}])
-
-        result = list(ResultSet(persistence, PersistentClass))
+        result = list(self.resultset)
 
         assert_that(len(result), is_(2))
         assert_that(result[0].field, is_(u'test1'))
@@ -40,15 +39,42 @@ class TestResultSet(unittest.TestCase):
         assert_that(result[1].field, is_(u'test2'))
         assert_that(result[1]._id, is_(2))
 
-    def test_persistent_objects_have_persisted_flag_to_true(self):
-        persistence = empty_spy()
+    def test_iter_sets_persisted_flag_to_true(self):
+        when(self.persistence.select).then_return(self.result())
 
-        when(persistence.select).with_args(PersistentClass).then_return([{u'_id': 1, u'field': u'test1'}])
-
-        result = list(ResultSet(persistence, PersistentClass))
+        result = list(self.resultset)
 
         assert_that(result[0].__cormoran_persisted__)
+        assert_that(result[1].__cormoran_persisted__)
 
+    def test_iter_calls_persistence_select_with_filters(self):
+        when(self.persistence.select).then_return(self.result())
+
+        self.resultset.filter(field=u'test')
+
+        list(self.resultset)
+
+        assert_that_method(self.persistence.select).was_called().with_args(
+            PersistentClass, filters=self.resultset._filters)
+
+    def test_filter_adds_kwargs_as_filters(self):
+        self.resultset.filter(field=u'test')
+
+        assert_that(self.resultset._filters, has_entry('field', u'test'))
+
+    def test_filter_inexistent_field_argument_raises_value_error(self):
+        with assert_raises(ValueError):
+            self.resultset.filter(inexistent=u'foo')
+
+    def result(self):
+        return [
+            {u'_id': 1, u'field': u'test1'},
+            {u'_id': 2, u'field': u'test2'}
+        ]
+
+    def setUp(self):
+        self.persistence = empty_spy()
+        self.resultset = ResultSet(self.persistence, PersistentClass)
 
 
 class PersistentClass(Persistent):
