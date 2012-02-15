@@ -90,9 +90,16 @@ class Delete(BaseExpr):
 
 
 class Select(BaseExpr):
+    def __init__(self, persistent, filters=None):
+        super(Select, self).__init__(persistent)
+
+        if filters is None:
+            filters = {}
+        self._filters = filters
+
     @property
     def values(self):
-        return []
+        return self._filters.values()
 
     @property
     def columns(self):
@@ -101,4 +108,10 @@ class Select(BaseExpr):
     def __str__(self):
         sql = 'SELECT * FROM '
         sql += self.table
+
+        if self._filters:
+            sql += ' WHERE '
+            sql += ' AND '.join(
+                '%s=?' % self._fields[x].name for x in self._filters)
+
         return sql

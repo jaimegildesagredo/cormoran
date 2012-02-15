@@ -120,3 +120,22 @@ class TestSelect(_ExprTestCase):
 
     def test_str_is_select_statement(self):
         assert_that(str(self.expr), is_('SELECT * FROM persistentclass'))
+
+    def test_str_with_filter_returns_select_with_where_clause(self):
+        self.expr = self.expr_cls(self.persistent, filters={'field': u'test'})
+
+        assert_that(str(self.expr),
+            is_('SELECT * FROM persistentclass WHERE field=?'))
+
+    def test_str_with_filters_returns_select_with_where_and_clause(self):
+        self.expr = self.expr_cls(self.persistent,
+            filters={'field': u'test', '_id': 1})
+
+        assert_that(str(self.expr),
+            is_('SELECT * FROM persistentclass WHERE field=? AND _id=?'))
+
+    def test_values_with_filters_returns_filters_values(self):
+        self.expr = self.expr_cls(self.persistent,
+            filters={'field': u'test', '_id': 1})
+
+        assert_that(self.expr.values, contains(u'test', 1))

@@ -41,7 +41,7 @@ class Persistence(Persistence_):
         delete = Delete(persistent)
         self._cursor().execute(str(delete), delete.values)
 
-    def select(self, persistent_cls):
-        select = Select(persistent_cls)
-        cursor = self._cursor().execute(str(select))
+    def select(self, persistent_cls, filters):
+        select = Select(persistent_cls, filters)
+        cursor = self._cursor().execute(str(select), select.values)
         return cursor
