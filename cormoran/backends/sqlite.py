@@ -2,7 +2,7 @@
 
 from cormoran.persistence import Persistence as Persistence_
 from cormoran.fields import IntegerField
-from cormoran.sql.expr import Insert, Update, Delete, Select
+from cormoran.sql.statements import Insert, Update, Delete, Select
 
 import sqlite3 as dbapi2
 
@@ -27,21 +27,16 @@ class Persistence(Persistence_):
         self._transaction = False
 
     def insert(self, persistent):
-        insert = Insert(persistent)
-
-        cursor = self._cursor().execute(str(insert), insert.values)
+        cursor = self._cursor().execute(*Insert().compile(persistent))
 
         return cursor.lastrowid
 
     def update(self, persistent):
-        update = Update(persistent)
-        self._cursor().execute(str(update), update.values)
+        self._cursor().execute(*Update().compile(persistent))
 
     def delete(self, persistent):
-        delete = Delete(persistent)
-        self._cursor().execute(str(delete), delete.values)
+        self._cursor().execute(*Delete().compile(persistent))
 
-    def select(self, persistent_cls, filters):
-        select = Select(persistent_cls, filters)
-        cursor = self._cursor().execute(str(select), select.values)
+    def select(self, persistent, filters):
+        cursor = self._cursor().execute(*Select().compile(persistent, filters))
         return cursor
