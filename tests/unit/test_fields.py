@@ -129,7 +129,7 @@ class TestStringField(_BaseFieldTestCase):
 class TestFloatField(_BaseFieldTestCase):
     FieldClass = FloatField
 
-    def test_set_integer_stores_float_value_in_persistend_data_store(self):
+    def test_set_integer_stores_float_value_in_persistent_data_store(self):
         user = self.User(field=1)
 
         assert_that(user.field, is_(1.0))
