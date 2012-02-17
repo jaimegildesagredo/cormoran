@@ -137,7 +137,7 @@ class TestPersistent(unittest.TestCase):
         assert_that(persistent.__cormoran_data__, instance_of(dict))
         assert_that(persistent.__cormoran_data__, has_length(0))
 
-    def test_data_store_dict_is_independent_of_the_instance(self):
+    def test_data_store_dict_is_instance_independent(self):
         persistent = self.persistent_class()
         another = self.persistent_class()
 
