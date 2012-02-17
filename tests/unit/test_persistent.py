@@ -131,6 +131,20 @@ class TestPersistent(unittest.TestCase):
 
         assert_that(not persistent.__cormoran_persisted__)
 
+    def test_data_store_dict_is_empty_by_default(self):
+        persistent = self.persistent_class()
+
+        assert_that(persistent.__cormoran_data__, instance_of(dict))
+        assert_that(persistent.__cormoran_data__, has_length(0))
+
+    def test_data_store_dict_is_independent_of_the_instance(self):
+        persistent = self.persistent_class()
+        another = self.persistent_class()
+
+        persistent.__cormoran_data__['field'] = u'test'
+
+        assert_that(another.__cormoran_data__, has_length(0))
+
     def setUp(self):
         class PersistentClass(Persistent):
             field = StringField(name='field_name')

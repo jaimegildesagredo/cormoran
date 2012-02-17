@@ -17,29 +17,38 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-class FieldError(Exception):
-    pass
-
-
 class BaseField(object):
-    def __init__(self, name=None, default=None, primary=False):
-        if self.__class__ is BaseField:
-            raise FieldError()
+    def __init__(self, name=None, primary=False, default=None, nullable=True):
         self.name = name
-        self.default = default
         self.primary = primary
+        self.nullable = nullable
+        self.default = default if default is None else self.validate(default)
 
     def __get__(self, instance, owner):
-        if instance is None:
-            return self
+        if instance:
+            return instance.__cormoran_data__.get(self.name, self.default)
+        return self
 
-        return self.default
+    def __set__(self, instance, value):
+        instance.__cormoran_data__[self.name] = self._validate(value)
 
+    def _validate(self, value):
+        if value is None:
+            if not self.nullable:
+                raise ValueError()
+            return value
+        else:
+            return self.validate(value)
 
-class StringField(BaseField):
-    pass
+    def validate(self, value):
+        raise NotImplementedError()
 
 
 class IntegerField(BaseField):
-    pass
+    def validate(self, value):
+        return int(value)
 
+
+class StringField(BaseField):
+    def validate(self, value):
+        return unicode(value)

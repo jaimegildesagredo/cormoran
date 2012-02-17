@@ -53,6 +53,12 @@ class Persistent(object):
 
     __cormoran_persisted__ = False
 
+    def __new__(cls, **kwargs):
+        instance = super(Persistent, cls).__new__(cls, **kwargs)
+        instance.__cormoran_data__ = {}
+
+        return instance
+
     def __init__(self, **kwargs):
         for k, v in kwargs.iteritems():
             setattr(self, k, v)

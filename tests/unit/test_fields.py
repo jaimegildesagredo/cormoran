@@ -19,49 +19,108 @@
 
 import unittest
 from hamcrest import *
-from nose.tools import assert_raises
+from nose.tools import assert_raises, nottest
 
-from cormoran.fields import BaseField, FieldError
+from cormoran.persistent import Persistent
+from cormoran.fields import IntegerField, StringField
 
+class _BaseFieldTestCase(unittest.TestCase):
 
-class CustomField(BaseField):
-    pass
+    def test_name_is_none_by_default(self):
+        assert_that(self.field.name, is_(None))
 
+    def test_name_from_constructor_key_argument(self):
+        self.field = self.FieldClass(name=u'field')
 
-class TestBaseField(unittest.TestCase):
-    def test_instantiate_raises_field_error(self):
-        with assert_raises(FieldError):
-            BaseField()
+        assert_that(self.field.name, is_(u'field'))
 
-    def test_instantiate_subclass_is_ok(self):
-        CustomField()
+    def test_name_from_constructor_positional_argument(self):
+        self.field = self.FieldClass(u'field')
 
-    def test_get_from_class_returns_field(self):
-        assert_that(self.cls.field, is_(self.field))
-
-    def test_get_from_instance_returns_default_value(self):
-        assert_that(self.cls().field, is_(self.field.default))
-
-    def test_get_from_instance_returns_stored_value(self):
-        instance = self.cls()
-        instance.field = u'test'
-
-        assert_that(instance.field, is_(u'test'))
-        assert_that(self.cls.field, is_(self.field))
+        assert_that(self.field.name, is_(u'field'))
 
     def test_primary_is_false_by_default(self):
-        assert_that(self.field.primary, is_(False))
+        assert_that(not self.field.primary)
 
-    def test_use_other_value_for_primary(self):
-        self.field = CustomField(primary=True)
+    def test_primary_from_constructor_argument(self):
+        self.field = self.FieldClass(primary=True)
 
         assert_that(self.field.primary)
 
+    def test_default_is_none_by_default(self):
+        assert_that(self.field.default, is_(None))
+
+    def test_default_from_constructor_argument(self):
+        self.field = self.FieldClass(default=self.valid())
+
+        assert_that(self.field.default, is_(self.valid()))
+
+    def test_invalid_default_raises_value_error(self):
+        with assert_raises(ValueError):
+            self.FieldClass(default=self.invalid())
+
+    def test_nullable_is_true_by_default(self):
+        assert_that(self.field.nullable)
+
+    def test_nullable_from_constructor_argument(self):
+        self.field = self.FieldClass(nullable=False)
+
+        assert_that(not self.field.nullable)
+
+    def test_get_from_persistent_class_returns_field(self):
+        assert_that(self.User.field, instance_of(self.FieldClass))
+
+    def test_get_from_persistent_instance_returns_default(self):
+        assert_that(self.User().field, is_(None))
+
+    def test_get_from_persistent_instance_returns_value(self):
+        assert_that(self.User(field=self.valid()).field, is_(self.valid()))
+
+    def test_set_stores_value_in_persistent_data_store(self):
+        user = self.User(field=self.valid())
+
+        assert_that(user.__cormoran_data__, has_entry(u'field', self.valid()))
+
+    def test_set_invalid_value_raises_value_error(self):
+        with assert_raises(ValueError):
+            self.User(field=self.invalid())
+
+    def test_set_none_value_if_nullable_is_ok(self):
+        assert_that(self.User(field=None).field, is_(None))
+
+    def test_set_none_value_if_not_nullable_raises_value_error(self):
+        with assert_raises(ValueError):
+            self.User(another=None)
+
     def setUp(self):
-        self.field = CustomField()
+        class User(Persistent):
+            field = self.FieldClass()
+            another = self.FieldClass(nullable=False)
 
-        class Cls(object):
-            field = self.field
+        self.User = User
+        self.field = self.FieldClass()
 
-        self.cls = Cls
 
+class TestIntegerField(_BaseFieldTestCase):
+    FieldClass = IntegerField
+
+    def valid(self):
+        return 1
+
+    def invalid(self):
+        return u'test'
+
+
+class TestStringField(_BaseFieldTestCase):
+    FieldClass = StringField
+
+    @nottest
+    def test_invalid_default_raises_value_error(self):
+        pass
+
+    @nottest
+    def test_set_invalid_value_raises_value_error(self):
+        pass
+
+    def valid(self):
+        return u'test'
