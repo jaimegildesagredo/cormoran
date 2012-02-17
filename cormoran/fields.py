@@ -57,3 +57,8 @@ class StringField(BaseField):
 class FloatField(BaseField):
     def validate(self, value):
         return float(value)
+
+
+class BooleanField(BaseField):
+    def validate(self, value):
+        return bool(value)
