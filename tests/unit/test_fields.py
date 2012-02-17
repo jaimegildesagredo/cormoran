@@ -22,7 +22,7 @@ from hamcrest import *
 from nose.tools import assert_raises, nottest
 
 from cormoran.persistent import Persistent
-from cormoran.fields import IntegerField, StringField
+from cormoran.fields import IntegerField, StringField, FloatField
 
 class _BaseFieldTestCase(unittest.TestCase):
 
@@ -123,4 +123,19 @@ class TestStringField(_BaseFieldTestCase):
         pass
 
     def valid(self):
+        return u'test'
+
+
+class TestFloatField(_BaseFieldTestCase):
+    FieldClass = FloatField
+
+    def test_set_integer_stores_float_value_in_persistend_data_store(self):
+        user = self.User(field=1)
+
+        assert_that(user.field, is_(1.0))
+
+    def valid(self):
+        return 1.0
+
+    def invalid(self):
         return u'test'

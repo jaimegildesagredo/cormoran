@@ -52,3 +52,8 @@ class IntegerField(BaseField):
 class StringField(BaseField):
     def validate(self, value):
         return unicode(value)
+
+
+class FloatField(BaseField):
+    def validate(self, value):
+        return float(value)
