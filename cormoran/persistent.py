@@ -51,11 +51,10 @@ class PersistentMetaclass(type):
 class Persistent(object):
     __metaclass__ = PersistentMetaclass
 
-    __cormoran_persisted__ = False
-
     def __new__(cls, **kwargs):
         instance = super(Persistent, cls).__new__(cls, **kwargs)
         instance.__cormoran_data__ = {}
+        instance.__cormoran_persisted__ = False
 
         return instance
 

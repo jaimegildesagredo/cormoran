@@ -131,6 +131,15 @@ class TestPersistent(unittest.TestCase):
 
         assert_that(not persistent.__cormoran_persisted__)
 
+    def test_persisted_flag_is_instance_independet(self):
+        persistent = self.persistent_class()
+        another = self.persistent_class()
+
+        persistent.__cormoran_persisted__ = True
+
+        assert_that(persistent.__cormoran_persisted__,
+            is_not(another.__cormoran_persisted__))
+
     def test_data_store_dict_is_empty_by_default(self):
         persistent = self.persistent_class()
 
