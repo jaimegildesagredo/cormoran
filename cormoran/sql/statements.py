@@ -29,8 +29,6 @@ class DMLStmt(SQLStmt):
         self.append(getattr(persistent, x) for x in
             persistent.__cormoran_pk__)
 
-    def _where(self, fields):
-        return 
 
 class Select(SQLStmt):
     def compile(self, persistent, filters=None):
