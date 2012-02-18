@@ -47,15 +47,15 @@ class TestResultSet(unittest.TestCase):
         assert_that(result[0].__cormoran_persisted__)
         assert_that(result[1].__cormoran_persisted__)
 
-    def test_iter_calls_persistence_select_with_filters(self):
+    def test_iter_calls_persistence_select_with_filters_and_limit(self):
         when(self.persistence.select).then_return(self.result())
-
-        self.resultset.filter(field=u'test')
 
         list(self.resultset)
 
         assert_that_method(self.persistence.select).was_called().with_args(
-            PersistentClass, filters=self.resultset._filters)
+            PersistentClass,
+            filters=self.resultset._filters,
+            limit=self.resultset._limit)
 
     def test_filter_adds_kwargs_as_filters(self):
         self.resultset.filter(field=u'test')

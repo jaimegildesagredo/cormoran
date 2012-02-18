@@ -28,7 +28,8 @@ class ResultSet(object):
     def __iter__(self):
         results = self._persistence.select(
             self._persistent_cls,
-            filters=self._filters
+            filters=self._filters,
+            limit=self._limit
         )
 
         for result in results:
