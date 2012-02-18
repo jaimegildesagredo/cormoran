@@ -49,6 +49,8 @@ class PersistentMetaclass(type):
 
 
 class Persistent(object):
+    """The :class:`Persistent` class."""
+
     __metaclass__ = PersistentMetaclass
 
     def __new__(cls, **kwargs):

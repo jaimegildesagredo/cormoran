@@ -22,6 +22,8 @@ from cormoran.resultset import ResultSet
 
 
 class Store(object):
+    """The :class:`Store` class."""
+
     def __init__(self, persistence):
         self.persistence = persistence
         self.new = list()
@@ -29,6 +31,11 @@ class Store(object):
         self.deleted = list()
 
     def add(self, persistent):
+        """Adds the :class:`persistent.Persistent` subclass object to
+        this :class:`Store`.
+
+        """
+
         if not isinstance(persistent, Persistent):
             raise TypeError()
 
