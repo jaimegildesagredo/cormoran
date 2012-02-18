@@ -1,0 +1,3 @@
+Overview
+========
+Cormoran is a fast and lightweight persistence framework.
