@@ -31,7 +31,7 @@ class DMLStmt(SQLStmt):
 
 
 class Select(SQLStmt):
-    def compile(self, persistent, filters=None):
+    def compile(self, persistent, filters=None, limit=None):
         self.write('SELECT')
         self.write(self._columns(persistent.__cormoran_fields__))
         self.write('FROM')
@@ -39,6 +39,9 @@ class Select(SQLStmt):
 
         if filters:
             self.compile_where(persistent.__cormoran_fields__, filters)
+
+        if limit:
+            self.compile_limit(limit)
 
         return self.flush(), self._params
 
@@ -56,6 +59,14 @@ class Select(SQLStmt):
         self.write('WHERE')
         self.write(' AND '.join(self._assignment(fields[x]) for x in filters))
         self.append(filters.values())
+
+    def compile_limit(self, limit):
+        if limit.stop:
+            self.write('LIMIT')
+            self.write(str(limit.stop))
+        if limit.start:
+            self.write('OFFSET')
+            self.write(str(limit.start))
 
 
 class Update(DMLStmt):

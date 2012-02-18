@@ -105,6 +105,21 @@ class TestSelect(unittest.TestCase):
             'SELECT _id, name FROM users WHERE _id=? AND name=?'))
         assert_that(params, contains(1, u'Mike'))
 
+    def test_compile_with_limit_stop_adds_limit_clause(self):
+        compiled, params = self.stmt.compile(User, limit=slice(1))
+
+        assert_that(compiled, is_('SELECT _id, name FROM users LIMIT 1'))
+
+    def test_compile_with_limit_start_and_stop_adds_offset_clause(self):
+        compiled, params = self.stmt.compile(User, limit=slice(1, 1))
+
+        assert_that(compiled, is_('SELECT _id, name FROM users LIMIT 1 OFFSET 1'))
+
+    def test_compile_with_empty_slice_limit_doesnt_adds_limit_clause(self):
+        compiled, params = self.stmt.compile(User, limit=slice(None))
+
+        assert_that(compiled, is_('SELECT _id, name FROM users'))
+
     def setUp(self):
         self.stmt = Select()
 
