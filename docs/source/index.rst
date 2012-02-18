@@ -13,8 +13,7 @@ Contents:
 
    tutorial
    library/index
-
-
+   releases/index
 
 Indices and tables
 ==================

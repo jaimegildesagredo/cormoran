@@ -1,0 +1,15 @@
+What's new in Cormoran 0.1?
+===========================
+We are pleased to announce the initial release of the Cormoran framework. This release is available from https://github.com/jaimegildesagredo/cormoran/cormoran-0.1.tar.gz.
+
+As this is the first version of Cormoran there are not news, but these are the main features.
+
+Features
+^^^^^^^^
+
+* Basic CRUD behavior through Store.
+* Basic querying and pagination.
+* Definition of data models through Persistent class.
+* String, Integer, Float and Boolean base fields.
+* SQLite backend.
+
