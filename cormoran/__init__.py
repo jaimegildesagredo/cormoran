@@ -16,6 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from cormoran.store import Store
+from cormoran.persistence import connect
+from cormoran.persistent import Persistent
+from cormoran.fields import IntegerField, StringField, FloatField, BooleanField
+
+
+__all__ = ['Store', 'connect', 'Persistent', 'IntegerField', 'StringField',
+'FloatField', 'BooleanField']
 
 __version__ = u'git'
 
