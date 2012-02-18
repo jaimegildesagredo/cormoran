@@ -17,6 +17,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+def connect(uri):
+    schema, database = uri.split(':///')
+    backend = __import__('cormoran.backends.' + schema,
+        fromlist=['Persistence'])
+    return backend.Persistence(database)
+
+
 class Persistence(object):
     def begin_transaction(self):
         raise NotImplementedError()
