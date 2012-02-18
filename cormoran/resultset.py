@@ -23,6 +23,7 @@ class ResultSet(object):
         self._persistent_cls = persistent_cls
 
         self._filters = {}
+        self._limit = slice(None)
 
     def __iter__(self):
         results = self._persistence.select(
@@ -41,4 +42,12 @@ class ResultSet(object):
                 raise ValueError()
             self._filters[k] = kwargs[k]
 
+        return self
+
+    def limit(self, stop):
+        self._limit = slice(self._limit.start, stop)
+        return self
+
+    def skip(self, start):
+        self._limit = slice(start, self._limit.stop or -1)
         return self

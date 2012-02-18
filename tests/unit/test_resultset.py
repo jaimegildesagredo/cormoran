@@ -71,6 +71,51 @@ class TestResultSet(unittest.TestCase):
 
         assert_that(resultset, is_(self.resultset))
 
+    def test_limit_adds_slice_with_stop_value(self):
+        self.resultset.limit(5)
+
+        limit = self.resultset._limit
+
+        assert_that(limit, instance_of(slice))
+        assert_that(limit.stop, is_(5))
+
+    def test_skip_adds_slice_with_start_value_and_stop_negative(self):
+        self.resultset.skip(2)
+
+        limit = self.resultset._limit
+
+        assert_that(limit, instance_of(slice))
+        assert_that(limit.start, is_(2))
+        assert_that(limit.stop, is_(-1))
+
+    def test_limit_with_already_set_skip_preserves_skip(self):
+        self.resultset.skip(1)
+        self.resultset.limit(2)
+
+        limit = self.resultset._limit
+
+        assert_that(limit.start, is_(1))
+        assert_that(limit.stop, is_(2))
+
+    def test_skip_with_already_set_limit_preserves_limit(self):
+        self.resultset.limit(1)
+        self.resultset.skip(2)
+
+        limit = self.resultset._limit
+
+        assert_that(limit.start, is_(2))
+        assert_that(limit.stop, is_(1))
+
+    def test_limit_returns_the_resultset_object(self):
+        resultset = self.resultset.limit(1)
+
+        assert_that(resultset, is_(self.resultset))
+
+    def test_skip_returns_the_resultset_object(self):
+        resultset = self.resultset.skip(1)
+
+        assert_that(resultset, is_(self.resultset))
+
     def result(self):
         return [
             {u'_id': 1, u'field': u'test1'},
