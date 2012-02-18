@@ -25,5 +25,5 @@ from cormoran.fields import IntegerField, StringField, FloatField, BooleanField
 __all__ = ['Store', 'connect', 'Persistent', 'IntegerField', 'StringField',
 'FloatField', 'BooleanField']
 
-__version__ = 'git'
+__version__ = '0.1'
 
