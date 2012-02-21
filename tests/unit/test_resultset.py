@@ -74,37 +74,24 @@ class TestResultSet(unittest.TestCase):
     def test_limit_adds_slice_with_stop_value(self):
         self.resultset.limit(5)
 
-        limit = self.resultset._limit
-
-        assert_that(limit, instance_of(slice))
-        assert_that(limit.stop, is_(5))
+        self.assert_that_limit(None, 5)
 
     def test_skip_adds_slice_with_start_value_and_stop_negative(self):
         self.resultset.skip(2)
 
-        limit = self.resultset._limit
-
-        assert_that(limit, instance_of(slice))
-        assert_that(limit.start, is_(2))
-        assert_that(limit.stop, is_(-1))
+        self.assert_that_limit(2, -1)
 
     def test_limit_with_already_set_skip_preserves_skip(self):
         self.resultset.skip(1)
         self.resultset.limit(2)
 
-        limit = self.resultset._limit
-
-        assert_that(limit.start, is_(1))
-        assert_that(limit.stop, is_(2))
+        self.assert_that_limit(1, 2)
 
     def test_skip_with_already_set_limit_preserves_limit(self):
         self.resultset.limit(1)
         self.resultset.skip(2)
 
-        limit = self.resultset._limit
-
-        assert_that(limit.start, is_(2))
-        assert_that(limit.stop, is_(1))
+        self.assert_that_limit(2, 1)
 
     def test_limit_returns_the_resultset_object(self):
         resultset = self.resultset.limit(1)
@@ -115,6 +102,45 @@ class TestResultSet(unittest.TestCase):
         resultset = self.resultset.skip(1)
 
         assert_that(resultset, is_(self.resultset))
+
+    def test_get_index_zero_sets_limit_to_one_and_returns_object(self):
+        when(self.persistence.select).then_return(self.result()[0:1])
+
+        result = self.resultset[0]
+
+        assert_that(result, instance_of(PersistentClass))
+        self.assert_that_limit(0, 1)
+
+    def test_get_index_greater_than_zero_sets_limit_and_offset(self):
+        when(self.persistence.select).then_return(self.result())
+
+        self.resultset[2]
+
+        self.assert_that_limit(2, 1)
+
+    def test_get_slice_start_zero_sets_same_limit_and_offset(self):
+        when(self.persistence.select).then_return(self.result())
+
+        result = self.resultset[0:2]
+
+        assert_that(result, has_length(2))
+        self.assert_that_limit(0, 2)
+
+    def test_get_slice_start_greater_that_zero_sets_limit_and_offset(self):
+        when(self.persistence.select).then_return(self.result())
+
+        self.resultset[2:5]
+
+        self.assert_that_limit(2, 3)
+
+    def test_get_without_results_raises_index_error(self):
+        when(self.persistence.select).then_return([])
+
+        with assert_raises(IndexError):
+            self.resultset[0]
+
+    def assert_that_limit(self, start, stop):
+        assert_that(self.resultset._limit, is_(slice(start, stop)))
 
     def result(self):
         return [

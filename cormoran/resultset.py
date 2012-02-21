@@ -37,6 +37,21 @@ class ResultSet(object):
             persistent.__cormoran_persisted__ = True
             yield persistent
 
+    def __getitem__(self, index):
+        if isinstance(index, slice):
+            self.limit(index.stop-index.start)
+            self.skip(index.start)
+        else:
+            self.limit(1)
+            self.skip(index)
+
+        result = list(self)
+        if len(result) == 0:
+            raise IndexError()
+        if len(result) == 1:
+            return result[0]
+        return result
+
     def filter(self, **kwargs):
         for k in kwargs:
             if k not in self._persistent_cls.__cormoran_fields__:
