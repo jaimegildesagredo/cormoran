@@ -107,10 +107,9 @@ class TestStore(unittest.TestCase):
 
         result = self.store.find(PersistentClass)
 
-        assert_that(result, instance_of(ResultSet))
-        # Using `is_` matcher doesn't work as expected.
-        assert_that(result._persistent_cls is PersistentClass)
-        assert_that(result._persistence, is_(self.store.persistence))
+        assert_that(result, is_(self.resultset))
+        assert_that_method(self.resultset_factory).was_called().with_args(
+            self.persistence, PersistentClass)
 
     def test_flush_calls_begin_transaction_persistence_method(self):
         self.store.flush()
@@ -195,9 +194,14 @@ class TestStore(unittest.TestCase):
         assert_that(self.store.dirty, is_not(contains(self.persistent)))
 
     def setUp(self):
+        self.resultset = empty_stub()
+        self.resultset_factory = empty_spy().resultset_factory
+        when(self.resultset_factory).then_return(self.resultset)
+
         self.persistent = PersistentClass()
         self.persistence = empty_spy()
-        self.store = Store(self.persistence)
+        self.store = Store(self.persistence,
+            resultset_factory=self.resultset_factory)
 
 
 class PersistentClass(Persistent):

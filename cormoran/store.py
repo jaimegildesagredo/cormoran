@@ -24,8 +24,10 @@ from cormoran.resultset import ResultSet
 class Store(object):
     """The :class:`Store` class."""
 
-    def __init__(self, persistence):
+    def __init__(self, persistence, resultset_factory=ResultSet):
         self.persistence = persistence
+        self._resultset_factory = resultset_factory
+
         self.new = list()
         self.dirty = list()
         self.deleted = list()
@@ -61,7 +63,7 @@ class Store(object):
 
         self.flush()
 
-        return ResultSet(self.persistence, persistent_cls)
+        return self._resultset_factory(self.persistence, persistent_cls)
 
     def flush(self):
         self.persistence.begin_transaction()
