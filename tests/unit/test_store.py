@@ -205,4 +205,4 @@ class TestStore(unittest.TestCase):
 
 
 class PersistentClass(Persistent):
-    field = StringField(primary=True)
+    field = StringField()

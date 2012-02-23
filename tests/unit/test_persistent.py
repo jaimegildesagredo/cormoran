@@ -27,137 +27,131 @@ from cormoran.fields import StringField, IntegerField
 
 class TestPersistent(unittest.TestCase):
     def test_sets_field_name_if_not_already_setted(self):
-        class PersistentClass(Persistent):
-            field = StringField()
-
-        assert_that(PersistentClass.field.name, is_('field'))
+        assert_that(User.email.name, is_('email'))
 
     def test_doesnt_set_field_name_if_already_setted(self):
-        assert_that(self.persistent_class.field.name, is_('field_name'))
+        assert_that(User.name.name, is_('username'))
 
     def test_create_fields_dict_with_persistent_fields(self):
-        assert_that(self.persistent_class.__cormoran_fields__, has_entries({
-            'field': self.persistent_class.field,
-            'other': self.persistent_class.other
+        assert_that(User.__cormoran_fields__, has_entries({
+            'name': User.name,
+            'email': User.email
         }))
 
     def test_default_cormoran_name_is_lowercase_class_name(self):
-        assert_that(self.persistent_class.__cormoran_name__,
-            is_(self.persistent_class.__name__.lower()))
+        assert_that(User.__cormoran_name__, is_(User.__name__.lower()))
 
     def test_set_cormoran_name_overwrites_default(self):
-        class PersistentClass(Persistent):
-            __cormoran_name__ = 'test'
+        class Group(Persistent):
+            __cormoran_name__ = u'users_groups'
 
-        assert_that(PersistentClass.__cormoran_name__, is_('test'))
+        assert_that(Group.__cormoran_name__, is_('users_groups'))
 
-    def test_use_primary_field_sets_cormoran_pk_attribute(self):
-        class PersistentClass(Persistent):
-            field = StringField(primary=True)
+    def test_without_primary_field_uses_default(self):
+        assert_that(User._id.primary)
+        assert_that(User._id.name, is_('_id'))
+        assert_that(User._id, instance_of(IntegerField))
+        assert_that(User.__cormoran_pk__, has_entry('_id', User._id))
 
-        assert_that(PersistentClass.__cormoran_pk__, has_entry(
-            'field', PersistentClass.field))
+    def test_with_primary_field_uses_it(self):
+        class User(Persistent):
+            name = StringField(primary=True)
 
-    def test_use_more_than_one_primary_field_sets_cormoran_pk_attribute(self):
-        class PersistentClass(Persistent):
-            field = StringField(primary=True)
-            other = StringField(primary=True)
+        assert_that(User.__cormoran_pk__, has_length(1))
+        assert_that(User.__cormoran_pk__, has_entry('name', User.name))
+        assert_that(User, is_not(has_property('_id')))
 
-        assert_that(PersistentClass.__cormoran_pk__, has_entries({
-            'field': PersistentClass.field,
-            'other': PersistentClass.other
+    def test_with_multiple_primary_raises_value_error(self):
+        with assert_raises(ValueError):
+            class User(Persistent):
+                _id = IntegerField(primary=True)
+                foo = StringField(primary=True)
+
+    def test_overwrite_default_primary_field_raises_value_error(self):
+        with assert_raises(ValueError):
+            class User(Persistent):
+                _id = StringField()
+
+    def test_overwrite_default_primary_field_and_use_other_instead(self):
+        class User(Persistent):
+            _id = StringField()
+            name = StringField(primary=True)
+
+        assert_that(User.__cormoran_pk__, has_length(1))
+        assert_that(User.__cormoran_pk__, has_entry('name', User.name))
+
+    def test_subclass_inherits_superclass_fields(self):
+        assert_that(FooUser.__cormoran_fields__, has_entries({
+            'name': FooUser.name,
+            'email': FooUser.email,
+            'foo': FooUser.foo
         }))
 
-    def test_without_primary_field_raises_value_error(self):
-        with assert_raises(ValueError):
-            class PersistentClass(Persistent):
-                _id = IntegerField(primary=False)
+    def test_subclass_inherits_other_superclass_attributes(self):
+        assert_that(FooUser.echo_user, is_(User.echo_user))
 
-    def test_default_sets_id_integer_primary_field(self):
-        assert_that(self.persistent_class._id, instance_of(IntegerField))
-        assert_that(self.persistent_class._id.primary)
-        assert_that(self.persistent_class.__cormoran_fields__,
-            has_entry('_id', self.persistent_class._id))
-        assert_that(self.persistent_class.__cormoran_pk__,
-            has_entry('_id', self.persistent_class._id))
+    def test_subclass_overwrites_superclass_fields(self):
+        class FooUser(User):
+            name = IntegerField()
 
-    def test_overwrite_default_id_field(self):
-        class PersistentClass(Persistent):
-            _id = StringField()
-            field = StringField(primary=True)
+        assert_that(FooUser.name, is_not(User.name))
+        assert_that(FooUser.__cormoran_fields__,
+            has_entry('name', FooUser.name))
 
-        assert_that(PersistentClass._id, instance_of(StringField))
-        assert_that(not PersistentClass._id.primary)
-        assert_that(PersistentClass.__cormoran_fields__,
-            has_entry('_id', PersistentClass._id))
+    def test_subclass_overwrites_superclass_attributes(self):
+        class FooUser(User):
+            def echo_user(self):
+                return 'foo'
 
-    def test_subclass_inherits_fields_from_super_class(self):
-        class PersistentSubclass(self.persistent_class):
-            pass
-
-        assert_that(PersistentSubclass.field, is_(self.persistent_class.field))
-        assert_that(PersistentSubclass.__cormoran_fields__,
-            has_entries(self.persistent_class.__cormoran_fields__))
-
-    def test_overwrite_inherited_field_from_super_class(self):
-        class PersistentSubclass(self.persistent_class):
-            _id = StringField()
-            field = StringField(primary=True)
-
-        assert_that(PersistentSubclass._id, instance_of(StringField))
-        assert_that(PersistentSubclass._id, is_not(self.persistent_class._id))
-        assert_that(PersistentSubclass.__cormoran_fields__,
-            has_entry('_id', PersistentSubclass._id))
+        assert_that(FooUser.echo_user, is_not(User.echo_user))
 
     def test_instantiate_with_kw_arguments_sets_fields_values(self):
-        persistent = self.persistent_class(field=u'test', other=u'other')
+        user = User(name=u'test', email=u'test@example.com')
 
-        assert_that(persistent.field, is_(u'test'))
-        assert_that(persistent.other, is_(u'other'))
+        assert_that(user.name, is_(u'test'))
+        assert_that(user.email, is_(u'test@example.com'))
 
     def test_instantiate_with_one_kw_argument_sets_these_field_value(self):
-        persistent = self.persistent_class(field=u'test')
+        user = User(name=u'test')
 
-        assert_that(persistent.field, is_(u'test'))
-        assert_that(persistent.other, is_(self.persistent_class.other.default))
+        assert_that(user.name, is_(u'test'))
+        assert_that(user.email, is_(User.email.default))
 
     def test_dict_returns_a_fields_values_dict(self):
-        persistent = self.persistent_class(_id=1, field=u'test', other=u'other')
-        assert_that(dict(persistent),
-            has_entries({u'_id': 1, u'field': u'test', u'other': u'other'}))
+        user = User(name=u'test')
+        assert_that(dict(user), has_entries({u'name': u'test'}))
 
     def test_persisted_flag_is_false_by_defalt(self):
-        persistent = self.persistent_class()
-
-        assert_that(not persistent.__cormoran_persisted__)
+        assert_that(not User().__cormoran_persisted__)
 
     def test_persisted_flag_is_instance_independet(self):
-        persistent = self.persistent_class()
-        another = self.persistent_class()
+        user, another = User(), User()
 
-        persistent.__cormoran_persisted__ = True
+        user.__cormoran_persisted__ = True
 
-        assert_that(persistent.__cormoran_persisted__,
+        assert_that(user.__cormoran_persisted__,
             is_not(another.__cormoran_persisted__))
 
     def test_data_store_dict_is_empty_by_default(self):
-        persistent = self.persistent_class()
+        user = User()
 
-        assert_that(persistent.__cormoran_data__, instance_of(dict))
-        assert_that(persistent.__cormoran_data__, has_length(0))
+        assert_that(user.__cormoran_data__, instance_of(dict))
+        assert_that(user.__cormoran_data__, has_length(0))
 
     def test_data_store_dict_is_instance_independent(self):
-        persistent = self.persistent_class()
-        another = self.persistent_class()
+        user, another = User(), User()
 
-        persistent.__cormoran_data__['field'] = u'test'
+        user.__cormoran_data__['field'] = u'test'
 
         assert_that(another.__cormoran_data__, has_length(0))
 
-    def setUp(self):
-        class PersistentClass(Persistent):
-            field = StringField(name='field_name')
-            other = StringField()
 
-        self.persistent_class = PersistentClass
+class User(Persistent):
+    name = StringField(name=u'username')
+    email = StringField()
 
+    def echo_user(self):
+        return '%s <%s>' % (self.name, self.email)
+
+class FooUser(User):
+    foo = IntegerField()

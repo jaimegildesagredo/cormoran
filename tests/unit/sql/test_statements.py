@@ -33,7 +33,7 @@ class User(Persistent):
 class Group(Persistent):
     __cormoran_name__ = u'groups'
 
-    name = StringField(name='groupname', primary=True)
+    name = StringField(name='groupname')
 
 
 class _StmtTestCase(unittest.TestCase):
@@ -133,13 +133,6 @@ class TestUpdate(_StmtTestCase):
         assert_that(compiled, is_('UPDATE users SET _id=?, name=? WHERE _id=?'))
         assert_that(params, contains(1, u'Bob', 1))
 
-    def test_compile_with_persistent_having_various_primary_fields(self):
-        compiled, params = self.stmt.compile(self.group)
-
-        assert_that(compiled, is_(
-            'UPDATE groups SET _id=?, groupname=? WHERE _id=? AND groupname=?'))
-        assert_that(params, contains(1, u'Admin', 1, u'Admin'))
-
 
 class TestDelete(_StmtTestCase):
     StmtClass = Delete
@@ -149,13 +142,6 @@ class TestDelete(_StmtTestCase):
 
         assert_that(compiled, is_('DELETE FROM users WHERE _id=?'))
         assert_that(params, contains(1))
-
-    def test_compile_with_persistent_having_various_primary_fields(self):
-        compiled, params = self.stmt.compile(self.group)
-
-        assert_that(compiled, is_(
-            'DELETE FROM groups WHERE _id=? AND groupname=?'))
-        assert_that(params, contains(1, u'Admin'))
 
 
 class TestInsert(_StmtTestCase):

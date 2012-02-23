@@ -21,31 +21,41 @@ from cormoran.fields import BaseField, IntegerField
 
 class PersistentMetaclass(type):
     def __new__(cls, name, bases, attrs):
-        cormoran_fields = {}
+        super_new = super(PersistentMetaclass, cls).__new__
 
+        parents = [x for x in bases if isinstance(x, PersistentMetaclass)]
+        if not parents:
+            return super_new(cls, name, bases, attrs)
+
+        fields, primary = {}, {}
         for base in bases:
             if hasattr(base, '__cormoran_fields__'):
-                cormoran_fields.update(base.__cormoran_fields__)
-
-        if '_id' not in attrs and '_id' not in cormoran_fields:
-            attrs['_id'] = IntegerField(primary=True)
+                fields.update(base.__cormoran_fields__)
+                primary.update(base.__cormoran_pk__)
 
         for key, value in attrs.iteritems():
             if isinstance(value, BaseField):
                 value.name = value.name or key
-                cormoran_fields[key] = value
+                fields[key] = value
+                if value.primary:
+                    primary[key] = value
 
-        cormoran_pk = dict(x for x in cormoran_fields.iteritems() if x[1].primary)
-        if len(cormoran_pk) == 0:
+        if not primary and '_id' not in fields:
+            default_primary = IntegerField(name='_id', primary=True)
+            primary[default_primary.name] = default_primary
+            attrs.update(primary)
+            fields.update(primary)
+
+        if len(primary) != 1:
             raise ValueError()
 
-        attrs['__cormoran_fields__'] = cormoran_fields
-        attrs['__cormoran_pk__'] = cormoran_pk
+        attrs['__cormoran_fields__'] = fields
+        attrs['__cormoran_pk__'] = primary
 
         if not '__cormoran_name__' in attrs:
             attrs['__cormoran_name__'] = name.lower()
 
-        return super(PersistentMetaclass, cls).__new__(cls, name, bases, attrs)
+        return super_new(cls, name, bases, attrs)
 
 
 class Persistent(object):
