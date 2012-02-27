@@ -1,9 +1,11 @@
 language: python
-before_script:
-    - virtualenv --distribute cormoran_env
-    - source cormoran_env/bin/activate
-    - pip install --use-mirrors nose pyhamcrest pydoubles
+python:
+    - "2.7"
+    - "2.6"
+
+install:
+    - pip install --use-mirrors nose pyhamcrest pydoubles coverage
+    - python setup.py develop
 
 script:
-    - python setup.py develop
     - nosetests tests/unit
