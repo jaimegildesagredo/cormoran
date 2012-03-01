@@ -65,6 +65,12 @@ class Store(object):
 
         return self._resultset_factory(self.persistence, persistent_cls)
 
+    def get(self, persistent_cls, identifier):
+        try:
+            return self.find(persistent_cls).filter(_id=identifier)[0]
+        except IndexError:
+            return None
+
     def flush(self):
         self.persistence.begin_transaction()
 

@@ -111,6 +111,29 @@ class TestStore(unittest.TestCase):
         assert_that_method(self.resultset_factory).was_called().with_args(
             self.persistence, PersistentClass)
 
+    def test_get_with_no_persistent_subclass_raises_type_error(self):
+        with assert_raises(TypeError):
+            self.store.get(str, 1)
+
+    def test_get_flush_and_returns_the_result(self):
+        # TODO: Test that flush method was called.
+        expected = PersistentClass()
+        when(self.resultset.filter).then_return([expected])
+
+        result = self.store.get(PersistentClass, 1)
+
+        assert_that(result, is_(expected))
+        assert_that_method(self.resultset_factory).was_called().with_args(
+            self.persistence, PersistentClass)
+        assert_that_method(self.resultset.filter).was_called().with_args(_id=1)
+
+    def test_get_with_no_result_returns_none(self):
+        when(self.resultset.filter).then_return([])
+
+        result = self.store.get(PersistentClass, 1)
+
+        assert_that(result, is_(None))
+
     def test_flush_calls_begin_transaction_persistence_method(self):
         self.store.flush()
 
@@ -194,7 +217,7 @@ class TestStore(unittest.TestCase):
         assert_that(self.store.dirty, is_not(contains(self.persistent)))
 
     def setUp(self):
-        self.resultset = empty_stub()
+        self.resultset = empty_spy()
         self.resultset_factory = empty_spy().resultset_factory
         when(self.resultset_factory).then_return(self.resultset)
 
