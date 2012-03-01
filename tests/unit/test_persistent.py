@@ -19,7 +19,7 @@
 
 import unittest
 from hamcrest import *
-from nose.tools import assert_raises
+from nose.tools import assert_raises, assert_raises_regexp
 
 from cormoran.persistent import Persistent
 from cormoran.fields import StringField, IntegerField
@@ -51,37 +51,53 @@ class TestPersistent(unittest.TestCase):
         assert_that(User._id.primary)
         assert_that(User._id.name, is_('_id'))
         assert_that(User._id, instance_of(IntegerField))
-        assert_that(User.__cormoran_pk__, has_entry('_id', User._id))
+        assert_that(User.__cormoran_fields__, has_entry('_id', User._id))
 
-    def test_with_primary_field_uses_it(self):
+    def test_with_primary_field_uses_it_and_alias_as_id(self):
         class User(Persistent):
             name = StringField(primary=True)
 
-        assert_that(User.__cormoran_pk__, has_length(1))
-        assert_that(User.__cormoran_pk__, has_entry('name', User.name))
-        assert_that(User, is_not(has_property('_id')))
+        assert_that(User._id, is_(User.name))
+        assert_that(User.__cormoran_fields__, is_not(has_item('_id')))
 
     def test_with_multiple_primary_raises_value_error(self):
-        with assert_raises(ValueError):
+        with assert_raises_regexp(ValueError,
+            'Persistent subclasses must have one primary field'):
+
             class User(Persistent):
-                _id = IntegerField(primary=True)
+                bar = IntegerField(primary=True)
                 foo = StringField(primary=True)
 
     def test_overwrite_default_primary_field_raises_value_error(self):
-        with assert_raises(ValueError):
+        with assert_raises_regexp(ValueError,
+            'Persistent subclasses must have one primary field'):
+
             class User(Persistent):
                 _id = StringField()
 
-    def test_overwrite_default_primary_field_and_use_other_instead(self):
-        class User(Persistent):
-            _id = StringField()
-            name = StringField(primary=True)
+    def test_overwrite_id_field_and_use_another_primary_raises_value_error(self):
+        with assert_raises_regexp(ValueError,
+            '`_id` attribute can only be overridden by a primary field.'):
 
-        assert_that(User.__cormoran_pk__, has_length(1))
-        assert_that(User.__cormoran_pk__, has_entry('name', User.name))
+            class User(Persistent):
+                _id = StringField()
+                name = StringField(primary=True)
+
+    def test_overwrite_id_field_with_primary_field_is_ok(self):
+        class User(Persistent):
+            _id = StringField(primary=True)
+
+        assert_that(User._id, instance_of(StringField))
+
+    def test_overwrite_superclass_id_field_with_primary_field_is_ok(self):
+        class FooUser(User):
+            _id = StringField(primary=True)
+
+        assert_that(FooUser._id, is_not(User._id))
 
     def test_subclass_inherits_superclass_fields(self):
         assert_that(FooUser.__cormoran_fields__, has_entries({
+            '_id': FooUser._id,
             'name': FooUser.name,
             'email': FooUser.email,
             'foo': FooUser.foo

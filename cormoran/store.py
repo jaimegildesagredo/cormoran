@@ -70,9 +70,8 @@ class Store(object):
 
         for persistent in self.new:
             _id = self.persistence.insert(persistent)
-            for name, field in persistent.__cormoran_pk__.iteritems():
-                if isinstance(field, IntegerField):
-                    setattr(persistent, name, getattr(persistent, name) or _id)
+            if isinstance(persistent.__class__._id, IntegerField):
+                setattr(persistent, '_id', getattr(persistent, '_id') or _id)
             persistent.__cormoran_persisted__ = True
 
         for persistent in self.dirty:

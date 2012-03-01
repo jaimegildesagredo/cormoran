@@ -27,18 +27,17 @@ class PersistentMetaclass(type):
         if not parents:
             return super_new(cls, name, bases, attrs)
 
-        fields, primary = {}, {}
+        fields = {}
         for base in bases:
             if hasattr(base, '__cormoran_fields__'):
                 fields.update(base.__cormoran_fields__)
-                primary.update(base.__cormoran_pk__)
 
         for key, value in attrs.iteritems():
             if isinstance(value, BaseField):
                 value.name = value.name or key
                 fields[key] = value
-                if value.primary:
-                    primary[key] = value
+
+        primary = dict(x for x in fields.iteritems() if x[1].primary)
 
         if not primary and '_id' not in fields:
             default_primary = IntegerField(name='_id', primary=True)
@@ -47,10 +46,15 @@ class PersistentMetaclass(type):
             fields.update(primary)
 
         if len(primary) != 1:
-            raise ValueError()
+            raise ValueError('Persistent subclasses must have one '
+                'primary field')
 
+        if '_id' in fields and '_id' not in primary:
+            raise ValueError('`_id` attribute can only be overridden by '
+                'a primary field.')
+
+        attrs['_id'] = primary.values()[0]
         attrs['__cormoran_fields__'] = fields
-        attrs['__cormoran_pk__'] = primary
 
         if not '__cormoran_name__' in attrs:
             attrs['__cormoran_name__'] = name.lower()

@@ -21,13 +21,9 @@ class SQLStmt(object):
 
 class DMLStmt(SQLStmt):
     def compile_where(self, persistent):
-        fields = persistent.__cormoran_pk__
         self.write('WHERE')
-        self.write(' AND '.join(self._assignment(x) for x in
-            fields.itervalues()))
-
-        self.append(getattr(persistent, x) for x in
-            persistent.__cormoran_pk__)
+        self.write(self._assignment(persistent.__class__._id))
+        self.append([getattr(persistent, '_id')])
 
 
 class Select(SQLStmt):
