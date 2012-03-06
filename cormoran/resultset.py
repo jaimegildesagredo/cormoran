@@ -54,7 +54,7 @@ class ResultSet(object):
 
     def filter(self, **kwargs):
         for k in kwargs:
-            if k not in self._persistent_cls.__cormoran_fields__:
+            if k not in self._persistent_cls._fields:
                 raise ValueError()
             self._filters[k] = kwargs[k]
 

@@ -33,7 +33,7 @@ class TestPersistent(unittest.TestCase):
         assert_that(User.name.name, is_('username'))
 
     def test_create_fields_dict_with_persistent_fields(self):
-        assert_that(User.__cormoran_fields__, has_entries({
+        assert_that(User._fields, has_entries({
             'name': User.name,
             'email': User.email
         }))
@@ -51,14 +51,14 @@ class TestPersistent(unittest.TestCase):
         assert_that(User._id.primary)
         assert_that(User._id.name, is_('_id'))
         assert_that(User._id, instance_of(IntegerField))
-        assert_that(User.__cormoran_fields__, has_entry('_id', User._id))
+        assert_that(User._fields, has_entry('_id', User._id))
 
     def test_with_primary_field_uses_it_and_alias_as_id(self):
         class User(Persistent):
             name = StringField(primary=True)
 
         assert_that(User._id, is_(User.name))
-        assert_that(User.__cormoran_fields__, is_not(has_item('_id')))
+        assert_that(User._fields, is_not(has_item('_id')))
 
     def test_with_multiple_primary_raises_value_error(self):
         with assert_raises_regexp(ValueError,
@@ -96,7 +96,7 @@ class TestPersistent(unittest.TestCase):
         assert_that(FooUser._id, is_not(User._id))
 
     def test_subclass_inherits_superclass_fields(self):
-        assert_that(FooUser.__cormoran_fields__, has_entries({
+        assert_that(FooUser._fields, has_entries({
             '_id': FooUser._id,
             'name': FooUser.name,
             'email': FooUser.email,
@@ -111,7 +111,7 @@ class TestPersistent(unittest.TestCase):
             name = IntegerField()
 
         assert_that(FooUser.name, is_not(User.name))
-        assert_that(FooUser.__cormoran_fields__,
+        assert_that(FooUser._fields,
             has_entry('name', FooUser.name))
 
     def test_subclass_overwrites_superclass_attributes(self):

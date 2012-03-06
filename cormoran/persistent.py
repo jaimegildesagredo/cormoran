@@ -29,8 +29,8 @@ class PersistentMetaclass(type):
 
         fields = {}
         for base in bases:
-            if hasattr(base, '__cormoran_fields__'):
-                fields.update(base.__cormoran_fields__)
+            if hasattr(base, '_fields'):
+                fields.update(base._fields)
 
         for key, value in attrs.iteritems():
             if isinstance(value, BaseField):
@@ -54,7 +54,7 @@ class PersistentMetaclass(type):
                 'a primary field.')
 
         attrs['_id'] = primary.values()[0]
-        attrs['__cormoran_fields__'] = fields
+        attrs['_fields'] = fields
 
         if not '__cormoran_name__' in attrs:
             attrs['__cormoran_name__'] = name.lower()
@@ -79,4 +79,4 @@ class Persistent(object):
             setattr(self, k, v)
 
     def __iter__(self):
-        return ((x, getattr(self, x)) for x in self.__cormoran_fields__)
+        return ((x, getattr(self, x)) for x in self._fields)
