@@ -31,7 +31,7 @@ class Select(SQLStmt):
         self.write('SELECT')
         self.write(self._columns(persistent._fields))
         self.write('FROM')
-        self.write(persistent.__cormoran_name__)
+        self.write(persistent.__name__)
 
         if filters:
             self.compile_where(persistent._fields, filters)
@@ -68,7 +68,7 @@ class Select(SQLStmt):
 class Update(DMLStmt):
     def compile(self, persistent):
         self.write('UPDATE')
-        self.write(persistent.__cormoran_name__)
+        self.write(persistent.__class__.__name__)
 
         self.compile_set(persistent)
         self.compile_where(persistent)
@@ -85,7 +85,7 @@ class Update(DMLStmt):
 class Delete(DMLStmt):
     def compile(self, persistent):
         self.write('DELETE FROM')
-        self.write(persistent.__cormoran_name__)
+        self.write(persistent.__class__.__name__)
 
         self.compile_where(persistent)
 
@@ -95,7 +95,7 @@ class Delete(DMLStmt):
 class Insert(SQLStmt):
     def compile(self, persistent):
         self.write('INSERT INTO')
-        self.write(persistent.__cormoran_name__)
+        self.write(persistent.__class__.__name__)
 
         self.compile_columns(persistent._fields)
         self.compile_values(persistent)

@@ -25,14 +25,10 @@ from cormoran.fields import StringField
 from cormoran.sql.statements import SQLStmt, Select, Update, Delete, Insert
 
 class User(Persistent):
-    __cormoran_name__ = u'users'
-
     name = StringField()
 
 
 class Group(Persistent):
-    __cormoran_name__ = u'groups'
-
     name = StringField(name='groupname')
 
 
@@ -83,18 +79,18 @@ class TestSelect(unittest.TestCase):
     def test_compile_returns_compiled_sql_and_params(self):
         compiled, params = self.stmt.compile(User)
 
-        assert_that(compiled, is_('SELECT _id, name FROM users'))
+        assert_that(compiled, is_('SELECT _id, name FROM User'))
         assert_that(params, has_length(0))
 
     def test_compile_with_different_field_names_use_alias(self):
         compiled, params = self.stmt.compile(Group)
 
-        assert_that(compiled, is_('SELECT _id, groupname AS name FROM groups'))
+        assert_that(compiled, is_('SELECT _id, groupname AS name FROM Group'))
 
     def test_compile_with_filter_adds_where_clause(self):
         compiled, params = self.stmt.compile(User, filters={'name': u'Mike'})
 
-        assert_that(compiled, is_('SELECT _id, name FROM users WHERE name=?'))
+        assert_that(compiled, is_('SELECT _id, name FROM User WHERE name=?'))
         assert_that(params, contains(u'Mike'))
 
     def test_compile_with_filters_adds_where_clause(self):
@@ -102,23 +98,23 @@ class TestSelect(unittest.TestCase):
             filters={'name': u'Mike', '_id': 1})
 
         assert_that(compiled, is_(
-            'SELECT _id, name FROM users WHERE _id=? AND name=?'))
+            'SELECT _id, name FROM User WHERE _id=? AND name=?'))
         assert_that(params, contains(1, u'Mike'))
 
     def test_compile_with_limit_stop_adds_limit_clause(self):
         compiled, params = self.stmt.compile(User, limit=slice(1))
 
-        assert_that(compiled, is_('SELECT _id, name FROM users LIMIT 1'))
+        assert_that(compiled, is_('SELECT _id, name FROM User LIMIT 1'))
 
     def test_compile_with_limit_start_and_stop_adds_offset_clause(self):
         compiled, params = self.stmt.compile(User, limit=slice(1, 1))
 
-        assert_that(compiled, is_('SELECT _id, name FROM users LIMIT 1 OFFSET 1'))
+        assert_that(compiled, is_('SELECT _id, name FROM User LIMIT 1 OFFSET 1'))
 
     def test_compile_with_empty_slice_limit_doesnt_adds_limit_clause(self):
         compiled, params = self.stmt.compile(User, limit=slice(None))
 
-        assert_that(compiled, is_('SELECT _id, name FROM users'))
+        assert_that(compiled, is_('SELECT _id, name FROM User'))
 
     def setUp(self):
         self.stmt = Select()
@@ -130,7 +126,7 @@ class TestUpdate(_StmtTestCase):
     def test_compile_returns_compiled_sql_and_params(self):
         compiled, params = self.stmt.compile(self.user)
 
-        assert_that(compiled, is_('UPDATE users SET _id=?, name=? WHERE _id=?'))
+        assert_that(compiled, is_('UPDATE User SET _id=?, name=? WHERE _id=?'))
         assert_that(params, contains(1, u'Bob', 1))
 
 
@@ -140,7 +136,7 @@ class TestDelete(_StmtTestCase):
     def test_compile_returns_compiled_sql_and_params(self):
         compiled, params = self.stmt.compile(self.user)
 
-        assert_that(compiled, is_('DELETE FROM users WHERE _id=?'))
+        assert_that(compiled, is_('DELETE FROM User WHERE _id=?'))
         assert_that(params, contains(1))
 
 
@@ -151,11 +147,11 @@ class TestInsert(_StmtTestCase):
         compiled, params = self.stmt.compile(self.user)
 
         assert_that(compiled, is_(
-            'INSERT INTO users (_id, name) VALUES (?, ?)'))
+            'INSERT INTO User (_id, name) VALUES (?, ?)'))
         assert_that(params, contains(1, u'Bob'))
 
     def test_compile_with_different_field_names(self):
         compiled, params = self.stmt.compile(self.group)
 
         assert_that(compiled, is_(
-            'INSERT INTO groups (_id, groupname) VALUES (?, ?)'))
+            'INSERT INTO Group (_id, groupname) VALUES (?, ?)'))

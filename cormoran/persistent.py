@@ -56,9 +56,6 @@ class PersistentMetaclass(type):
         attrs['_id'] = primary.values()[0]
         attrs['_fields'] = fields
 
-        if not '__cormoran_name__' in attrs:
-            attrs['__cormoran_name__'] = name.lower()
-
         return super_new(cls, name, bases, attrs)
 
 

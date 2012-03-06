@@ -38,15 +38,6 @@ class TestPersistent(unittest.TestCase):
             'email': User.email
         }))
 
-    def test_default_cormoran_name_is_lowercase_class_name(self):
-        assert_that(User.__cormoran_name__, is_(User.__name__.lower()))
-
-    def test_set_cormoran_name_overwrites_default(self):
-        class Group(Persistent):
-            __cormoran_name__ = u'users_groups'
-
-        assert_that(Group.__cormoran_name__, is_('users_groups'))
-
     def test_without_primary_field_uses_default(self):
         assert_that(User._id.primary)
         assert_that(User._id.name, is_('_id'))
