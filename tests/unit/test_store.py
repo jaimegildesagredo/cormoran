@@ -53,7 +53,7 @@ class TestStore(unittest.TestCase):
             self.store.add(str())
 
     def test_add_persisted_object_adds_it_to_dirty(self):
-        self.persistent.__cormoran_persisted__ = True
+        self.persistent._persisted = True
 
         self.store.add(self.persistent)
 
@@ -61,7 +61,7 @@ class TestStore(unittest.TestCase):
         assert_that(self.store.new, is_not(contains(self.persistent)))
 
     def test_add_already_added_persisted_object_doesnt_adds_it(self):
-        self.persistent.__cormoran_persisted__ = True
+        self.persistent._persisted = True
 
         self.store.add(self.persistent)
         self.store.add(self.persistent)
@@ -151,7 +151,7 @@ class TestStore(unittest.TestCase):
 
         self.store.flush()
 
-        assert_that(self.persistent.__cormoran_persisted__)
+        assert_that(self.persistent._persisted)
 
     def test_flush_populates_persisted_objects_integer_primary_fields(self):
         when(self.persistence.insert).with_args(self.persistent).then_return(1)
@@ -179,7 +179,7 @@ class TestStore(unittest.TestCase):
         assert_that_method(self.persistence.delete).was_called().with_args(self.persistent)
 
     def test_flush_updates_dirty_objects_in_persistence_mechanism(self):
-        self.persistent.__cormoran_persisted__ = True
+        self.persistent._persisted = True
 
         self.store.add(self.persistent)
         self.store.flush()
@@ -209,7 +209,7 @@ class TestStore(unittest.TestCase):
         assert_that(self.store.deleted, is_not(contains(self.persistent)))
 
     def test_commit_clears_dirty_objects_list(self):
-        self.persistent.__cormoran_persisted__ = True
+        self.persistent._persisted = True
 
         self.store.add(self.persistent)
         self.store.commit()

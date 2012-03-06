@@ -44,8 +44,8 @@ class TestResultSet(unittest.TestCase):
 
         result = list(self.resultset)
 
-        assert_that(result[0].__cormoran_persisted__)
-        assert_that(result[1].__cormoran_persisted__)
+        assert_that(result[0]._persisted)
+        assert_that(result[1]._persisted)
 
     def test_iter_calls_persistence_select_with_filters_and_limit(self):
         when(self.persistence.select).then_return(self.result())

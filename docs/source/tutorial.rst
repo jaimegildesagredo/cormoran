@@ -29,12 +29,11 @@ Defining data
 We need to define a new :class:`Persistent` subclass with all the fields we want to persists.
 
 >>> class User(Persistent):
-...    __cormoran_name__ = u'users'
 ...    email = StringField(nullable=False)
 ...    name = StringField()
 ...    is_active = BooleanField(default=False)
 
-The :class:`User` class has `email` and `name` string fields and `is_active` boolean field. The :attr:`__cormoran_name__` is an optional attribute to tell Cormoran which is the name of the collection (the SQL table). If not present will be the class name.
+The :class:`User` class has `email` and `name` string fields and `is_active` boolean field.
 
 Also an `_id` integer primary field has been automatically generated.
 
@@ -57,7 +56,7 @@ Next we will create a :class:`Store` object with our sqlite connection.
 
 For now Cormoran doesn't create the database structure and we need to create the tables manually, so we will execute the SQL create table statement.
 
->>> sqlite._connection.execute('CREATE TABLE users (_id integer primary key, email text not null, name text, is_active bool)')
+>>> sqlite._connection.execute('CREATE TABLE User (_id integer primary key, email text not null, name text, is_active bool)')
 
 Creating an object
 ------------------

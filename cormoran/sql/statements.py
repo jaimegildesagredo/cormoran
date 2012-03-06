@@ -29,12 +29,12 @@ class DMLStmt(SQLStmt):
 class Select(SQLStmt):
     def compile(self, persistent, filters=None, limit=None):
         self.write('SELECT')
-        self.write(self._columns(persistent.__cormoran_fields__))
+        self.write(self._columns(persistent._fields))
         self.write('FROM')
-        self.write(persistent.__cormoran_name__)
+        self.write(persistent.__name__)
 
         if filters:
-            self.compile_where(persistent.__cormoran_fields__, filters)
+            self.compile_where(persistent._fields, filters)
 
         if limit:
             self.compile_limit(limit)
@@ -68,7 +68,7 @@ class Select(SQLStmt):
 class Update(DMLStmt):
     def compile(self, persistent):
         self.write('UPDATE')
-        self.write(persistent.__cormoran_name__)
+        self.write(persistent.__class__.__name__)
 
         self.compile_set(persistent)
         self.compile_where(persistent)
@@ -76,16 +76,16 @@ class Update(DMLStmt):
         return self.flush(), self._params
 
     def compile_set(self, persistent):
-        fields = persistent.__cormoran_fields__
+        fields = persistent._fields
         self.write('SET')
         self.write(', '.join(self._assignment(x) for x in fields.itervalues()))
-        self.append(getattr(persistent, x) for x in persistent.__cormoran_fields__)
+        self.append(getattr(persistent, x) for x in persistent._fields)
 
 
 class Delete(DMLStmt):
     def compile(self, persistent):
         self.write('DELETE FROM')
-        self.write(persistent.__cormoran_name__)
+        self.write(persistent.__class__.__name__)
 
         self.compile_where(persistent)
 
@@ -95,9 +95,9 @@ class Delete(DMLStmt):
 class Insert(SQLStmt):
     def compile(self, persistent):
         self.write('INSERT INTO')
-        self.write(persistent.__cormoran_name__)
+        self.write(persistent.__class__.__name__)
 
-        self.compile_columns(persistent.__cormoran_fields__)
+        self.compile_columns(persistent._fields)
         self.compile_values(persistent)
 
         return self.flush(), self._params
@@ -106,6 +106,6 @@ class Insert(SQLStmt):
         self.write('(' + ', '.join(x.name for x in fields.itervalues()) + ')')
 
     def compile_values(self, persistent):
-        fields = persistent.__cormoran_fields__
+        fields = persistent._fields
         self.write('VALUES (' + ', '.join('?'*len(fields)) + ')')
         self.append(getattr(persistent, x) for x in fields)

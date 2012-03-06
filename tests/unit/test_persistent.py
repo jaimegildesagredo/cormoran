@@ -33,32 +33,23 @@ class TestPersistent(unittest.TestCase):
         assert_that(User.name.name, is_('username'))
 
     def test_create_fields_dict_with_persistent_fields(self):
-        assert_that(User.__cormoran_fields__, has_entries({
+        assert_that(User._fields, has_entries({
             'name': User.name,
             'email': User.email
         }))
-
-    def test_default_cormoran_name_is_lowercase_class_name(self):
-        assert_that(User.__cormoran_name__, is_(User.__name__.lower()))
-
-    def test_set_cormoran_name_overwrites_default(self):
-        class Group(Persistent):
-            __cormoran_name__ = u'users_groups'
-
-        assert_that(Group.__cormoran_name__, is_('users_groups'))
 
     def test_without_primary_field_uses_default(self):
         assert_that(User._id.primary)
         assert_that(User._id.name, is_('_id'))
         assert_that(User._id, instance_of(IntegerField))
-        assert_that(User.__cormoran_fields__, has_entry('_id', User._id))
+        assert_that(User._fields, has_entry('_id', User._id))
 
     def test_with_primary_field_uses_it_and_alias_as_id(self):
         class User(Persistent):
             name = StringField(primary=True)
 
         assert_that(User._id, is_(User.name))
-        assert_that(User.__cormoran_fields__, is_not(has_item('_id')))
+        assert_that(User._fields, is_not(has_item('_id')))
 
     def test_with_multiple_primary_raises_value_error(self):
         with assert_raises_regexp(ValueError,
@@ -96,7 +87,7 @@ class TestPersistent(unittest.TestCase):
         assert_that(FooUser._id, is_not(User._id))
 
     def test_subclass_inherits_superclass_fields(self):
-        assert_that(FooUser.__cormoran_fields__, has_entries({
+        assert_that(FooUser._fields, has_entries({
             '_id': FooUser._id,
             'name': FooUser.name,
             'email': FooUser.email,
@@ -111,7 +102,7 @@ class TestPersistent(unittest.TestCase):
             name = IntegerField()
 
         assert_that(FooUser.name, is_not(User.name))
-        assert_that(FooUser.__cormoran_fields__,
+        assert_that(FooUser._fields,
             has_entry('name', FooUser.name))
 
     def test_subclass_overwrites_superclass_attributes(self):
@@ -138,28 +129,28 @@ class TestPersistent(unittest.TestCase):
         assert_that(dict(user), has_entries({u'name': u'test'}))
 
     def test_persisted_flag_is_false_by_defalt(self):
-        assert_that(not User().__cormoran_persisted__)
+        assert_that(not User()._persisted)
 
     def test_persisted_flag_is_instance_independet(self):
         user, another = User(), User()
 
-        user.__cormoran_persisted__ = True
+        user._persisted = True
 
-        assert_that(user.__cormoran_persisted__,
-            is_not(another.__cormoran_persisted__))
+        assert_that(user._persisted,
+            is_not(another._persisted))
 
     def test_data_store_dict_is_empty_by_default(self):
         user = User()
 
-        assert_that(user.__cormoran_data__, instance_of(dict))
-        assert_that(user.__cormoran_data__, has_length(0))
+        assert_that(user._data, instance_of(dict))
+        assert_that(user._data, has_length(0))
 
     def test_data_store_dict_is_instance_independent(self):
         user, another = User(), User()
 
-        user.__cormoran_data__['field'] = u'test'
+        user._data['field'] = u'test'
 
-        assert_that(another.__cormoran_data__, has_length(0))
+        assert_that(another._data, has_length(0))
 
 
 class User(Persistent):
