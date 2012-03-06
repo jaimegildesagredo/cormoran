@@ -41,7 +41,7 @@ class Store(object):
         if not isinstance(persistent, Persistent):
             raise TypeError()
 
-        if persistent.__cormoran_persisted__:
+        if persistent._persisted:
             if persistent not in self.dirty:
                 self.dirty.append(persistent)
         else:
@@ -78,7 +78,7 @@ class Store(object):
             _id = self.persistence.insert(persistent)
             if isinstance(persistent.__class__._id, IntegerField):
                 setattr(persistent, '_id', getattr(persistent, '_id') or _id)
-            persistent.__cormoran_persisted__ = True
+            persistent._persisted = True
 
         for persistent in self.dirty:
             self.persistence.update(persistent)

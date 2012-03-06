@@ -138,15 +138,15 @@ class TestPersistent(unittest.TestCase):
         assert_that(dict(user), has_entries({u'name': u'test'}))
 
     def test_persisted_flag_is_false_by_defalt(self):
-        assert_that(not User().__cormoran_persisted__)
+        assert_that(not User()._persisted)
 
     def test_persisted_flag_is_instance_independet(self):
         user, another = User(), User()
 
-        user.__cormoran_persisted__ = True
+        user._persisted = True
 
-        assert_that(user.__cormoran_persisted__,
-            is_not(another.__cormoran_persisted__))
+        assert_that(user._persisted,
+            is_not(another._persisted))
 
     def test_data_store_dict_is_empty_by_default(self):
         user = User()

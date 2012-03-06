@@ -34,7 +34,7 @@ class ResultSet(object):
 
         for result in results:
             persistent = self._persistent_cls(**result)
-            persistent.__cormoran_persisted__ = True
+            persistent._persisted = True
             yield persistent
 
     def __getitem__(self, index):
