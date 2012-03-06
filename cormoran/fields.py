@@ -26,11 +26,11 @@ class BaseField(object):
 
     def __get__(self, instance, owner):
         if instance:
-            return instance.__cormoran_data__.get(self.name, self.default)
+            return instance._data.get(self.name, self.default)
         return self
 
     def __set__(self, instance, value):
-        instance.__cormoran_data__[self.name] = self._validate(value)
+        instance._data[self.name] = self._validate(value)
 
     def _validate(self, value):
         if value is None:

@@ -151,15 +151,15 @@ class TestPersistent(unittest.TestCase):
     def test_data_store_dict_is_empty_by_default(self):
         user = User()
 
-        assert_that(user.__cormoran_data__, instance_of(dict))
-        assert_that(user.__cormoran_data__, has_length(0))
+        assert_that(user._data, instance_of(dict))
+        assert_that(user._data, has_length(0))
 
     def test_data_store_dict_is_instance_independent(self):
         user, another = User(), User()
 
-        user.__cormoran_data__['field'] = u'test'
+        user._data['field'] = u'test'
 
-        assert_that(another.__cormoran_data__, has_length(0))
+        assert_that(another._data, has_length(0))
 
 
 class User(Persistent):

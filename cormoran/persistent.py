@@ -69,7 +69,7 @@ class Persistent(object):
 
     def __new__(cls, **kwargs):
         instance = super(Persistent, cls).__new__(cls, **kwargs)
-        instance.__cormoran_data__ = {}
+        instance._data = {}
         instance.__cormoran_persisted__ = False
 
         return instance

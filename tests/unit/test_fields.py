@@ -79,7 +79,7 @@ class _BaseFieldTestCase(unittest.TestCase):
     def test_set_stores_value_in_persistent_data_store(self):
         user = self.User(field=self.valid())
 
-        assert_that(user.__cormoran_data__, has_entry(u'field', self.valid()))
+        assert_that(user._data, has_entry(u'field', self.valid()))
 
     def test_set_invalid_value_raises_value_error(self):
         with assert_raises(ValueError):
