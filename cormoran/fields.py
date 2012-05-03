@@ -22,7 +22,7 @@ class BaseField(object):
         self.name = name
         self.primary = primary
         self.nullable = nullable
-        self.default = default if default is None else self.validate(default)
+        self.default = default and self.validate(default)
 
     def __get__(self, instance, owner):
         if instance:
