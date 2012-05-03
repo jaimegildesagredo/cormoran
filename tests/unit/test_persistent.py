@@ -124,6 +124,10 @@ class TestPersistent(unittest.TestCase):
         assert_that(user.name, is_(u'test'))
         assert_that(user.email, is_(User.email.default))
 
+    def test_instantiate_with_kw_argument_not_in_fields_raises_value_error(self):
+        with assert_raises(ValueError):
+            User(no_field=u'test')
+
     def test_dict_returns_a_fields_values_dict(self):
         user = User(name=u'test')
         assert_that(dict(user), has_entries({u'name': u'test'}))

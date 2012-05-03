@@ -73,6 +73,8 @@ class Persistent(object):
 
     def __init__(self, **kwargs):
         for k, v in kwargs.iteritems():
+            if k not in self._fields:
+                raise ValueError()
             setattr(self, k, v)
 
     def __iter__(self):
