@@ -8,7 +8,7 @@ import sqlite3 as dbapi2
 
 class Persistence(Persistence_):
     def __init__(self, uri):
-        self._connection = dbapi2.connect(uri['database'], isolation_level=None)
+        self._connection = dbapi2.connect(uri['db'], isolation_level=None)
         self._connection.row_factory = dbapi2.Row
 
         self._transaction = False

@@ -21,7 +21,7 @@ from cormoran.uri import URI
 
 def connect(uri):
     uri = URI(uri)
-    backend = __import__('cormoran.backends.' + uri['schema'],
+    backend = __import__('cormoran.backends.' + uri.schema,
         fromlist=['Persistence'])
     return backend.Persistence(uri)
 
