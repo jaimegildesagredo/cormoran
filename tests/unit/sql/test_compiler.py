@@ -82,3 +82,24 @@ class TestDelete(unittest.TestCase):
     def setUp(self):
         self.user = User(_id=1, name=u'Bob')
         self.compiler = SQLCompiler()
+
+
+class TestInsert(unittest.TestCase):
+    def test_compile_returns_compiled_sql_and_params(self):
+        compiled, params = self.compiler.insert(self.user)
+
+        assert_that(compiled, is_(
+            'INSERT INTO User (_id, name) VALUES (?, ?)'))
+        assert_that(params, contains(1, u'Bob'))
+
+    def test_compile_with_different_field_names(self):
+        compiled, params = self.compiler.insert(self.group)
+
+        assert_that(compiled, is_(
+            'INSERT INTO Group (_id, groupname) VALUES (?, ?)'))
+
+    def setUp(self):
+        self.user = User(_id=1, name=u'Bob')
+        self.group = Group(_id=1, name=u'Admin')
+
+        self.compiler = SQLCompiler()

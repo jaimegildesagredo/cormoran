@@ -20,24 +20,7 @@
 import unittest
 from hamcrest import *
 
-from cormoran.persistent import Persistent
-from cormoran.fields import StringField
-from cormoran.sql.statements import SQLStmt, Select, Update, Delete, Insert
-
-class User(Persistent):
-    name = StringField()
-
-
-class Group(Persistent):
-    name = StringField(name='groupname')
-
-
-class _StmtTestCase(unittest.TestCase):
-    def setUp(self):
-        self.user = User(_id=1, name=u'Bob')
-        self.group = Group(_id=1, name=u'Admin')
-
-        self.stmt = self.StmtClass()
+from cormoran.sql.statements import SQLStmt
 
 
 class TestSQLStmt(unittest.TestCase):
@@ -73,20 +56,3 @@ class TestSQLStmt(unittest.TestCase):
 
     def setUp(self):
         self.stmt = SQLStmt()
-
-
-class TestInsert(_StmtTestCase):
-    StmtClass = Insert
-
-    def test_compile_returns_compiled_sql_and_params(self):
-        compiled, params = self.stmt.compile(self.user)
-
-        assert_that(compiled, is_(
-            'INSERT INTO User (_id, name) VALUES (?, ?)'))
-        assert_that(params, contains(1, u'Bob'))
-
-    def test_compile_with_different_field_names(self):
-        compiled, params = self.stmt.compile(self.group)
-
-        assert_that(compiled, is_(
-            'INSERT INTO Group (_id, groupname) VALUES (?, ?)'))

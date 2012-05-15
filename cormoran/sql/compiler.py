@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from cormoran.sql.statements import Select, Update, Delete
+from cormoran.sql.statements import Select, Update, Delete, Insert
 
 
 class SQLCompiler(object):
@@ -12,3 +12,6 @@ class SQLCompiler(object):
 
     def delete(self, persistent):
         return Delete().compile(persistent)
+
+    def insert(self, persistent):
+        return Insert().compile(persistent)
