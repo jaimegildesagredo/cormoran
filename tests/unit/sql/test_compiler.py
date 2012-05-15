@@ -86,3 +86,31 @@ class TestSQLCompiler(unittest.TestCase):
         self.group = Group(_id=1, name=u'Admin')
 
         self.compiler = SQLCompiler()
+
+
+class TestSQLCompilerWithPlaceholder(unittest.TestCase):
+    def test_select_returns_sql_and_params(self):
+        compiled, params = self.compiler.select(User, filters={'name': u'Mike'})
+
+        assert_that(compiled, is_('SELECT _id, name FROM User WHERE name=%s'))
+
+    def test_update_returns_sql_and_params(self):
+        compiled, params = self.compiler.update(self.user)
+
+        assert_that(compiled, is_('UPDATE User SET _id=%s, name=%s WHERE _id=%s'))
+
+    def test_delete_returns_sql_and_params(self):
+        compiled, params = self.compiler.delete(self.user)
+
+        assert_that(compiled, is_('DELETE FROM User WHERE _id=%s'))
+
+    def test_insert_returns_sql_and_params(self):
+        compiled, params = self.compiler.insert(self.user)
+
+        assert_that(compiled, is_(
+            'INSERT INTO User (_id, name) VALUES (%s, %s)'))
+
+    def setUp(self):
+        self.user = User(_id=1, name=u'Bob')
+
+        self.compiler = SQLCompiler(placeholder='%s')

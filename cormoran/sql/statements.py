@@ -2,12 +2,14 @@
 
 
 class SQLStmt(object):
-    def __init__(self):
+    def __init__(self, placeholder='?'):
+        self.placeholder = placeholder
+
         self._buffer = []
         self._params = []
 
     def _assignment(self, field):
-        return field.name + '=?'
+        return field.name + '=' + self.placeholder
 
     def write(self, chunk):
         self._buffer.append(chunk)
@@ -107,5 +109,5 @@ class Insert(SQLStmt):
 
     def compile_values(self, persistent):
         fields = persistent._fields
-        self.write('VALUES (' + ', '.join('?'*len(fields)) + ')')
+        self.write('VALUES (' + ', '.join([self.placeholder]*len(fields)) + ')')
         self.append(getattr(persistent, x) for x in fields)
