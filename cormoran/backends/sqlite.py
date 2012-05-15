@@ -35,7 +35,7 @@ class Persistence(Persistence_):
         return cursor.lastrowid
 
     def update(self, persistent):
-        self._cursor().execute(*Update().compile(persistent))
+        self._cursor().execute(*self.compiler.update(persistent))
 
     def delete(self, persistent):
         self._cursor().execute(*Delete().compile(persistent))

@@ -75,16 +75,6 @@ class TestSQLStmt(unittest.TestCase):
         self.stmt = SQLStmt()
 
 
-class TestUpdate(_StmtTestCase):
-    StmtClass = Update
-
-    def test_compile_returns_compiled_sql_and_params(self):
-        compiled, params = self.stmt.compile(self.user)
-
-        assert_that(compiled, is_('UPDATE User SET _id=?, name=? WHERE _id=?'))
-        assert_that(params, contains(1, u'Bob', 1))
-
-
 class TestDelete(_StmtTestCase):
     StmtClass = Delete
 

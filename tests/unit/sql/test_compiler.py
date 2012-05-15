@@ -58,3 +58,15 @@ class TestSelect(unittest.TestCase):
 
     def setUp(self):
         self.compiler = SQLCompiler()
+
+
+class TestUpdate(unittest.TestCase):
+    def test_compile_returns_compiled_sql_and_params(self):
+        compiled, params = self.compiler.update(self.user)
+
+        assert_that(compiled, is_('UPDATE User SET _id=?, name=? WHERE _id=?'))
+        assert_that(params, contains(1, u'Bob', 1))
+
+    def setUp(self):
+        self.user = User(_id=1, name=u'Bob')
+        self.compiler = SQLCompiler()
