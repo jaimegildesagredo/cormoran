@@ -75,16 +75,6 @@ class TestSQLStmt(unittest.TestCase):
         self.stmt = SQLStmt()
 
 
-class TestDelete(_StmtTestCase):
-    StmtClass = Delete
-
-    def test_compile_returns_compiled_sql_and_params(self):
-        compiled, params = self.stmt.compile(self.user)
-
-        assert_that(compiled, is_('DELETE FROM User WHERE _id=?'))
-        assert_that(params, contains(1))
-
-
 class TestInsert(_StmtTestCase):
     StmtClass = Insert
 

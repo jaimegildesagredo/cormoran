@@ -38,7 +38,7 @@ class Persistence(Persistence_):
         self._cursor().execute(*self.compiler.update(persistent))
 
     def delete(self, persistent):
-        self._cursor().execute(*Delete().compile(persistent))
+        self._cursor().execute(*self.compiler.delete(persistent))
 
     def select(self, persistent, filters, limit):
         cursor = self._cursor().execute(

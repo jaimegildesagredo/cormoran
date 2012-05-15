@@ -70,3 +70,15 @@ class TestUpdate(unittest.TestCase):
     def setUp(self):
         self.user = User(_id=1, name=u'Bob')
         self.compiler = SQLCompiler()
+
+
+class TestDelete(unittest.TestCase):
+    def test_compile_returns_compiled_sql_and_params(self):
+        compiled, params = self.compiler.delete(self.user)
+
+        assert_that(compiled, is_('DELETE FROM User WHERE _id=?'))
+        assert_that(params, contains(1))
+
+    def setUp(self):
+        self.user = User(_id=1, name=u'Bob')
+        self.compiler = SQLCompiler()
