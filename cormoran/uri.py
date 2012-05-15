@@ -7,10 +7,10 @@ class URI(dict):
     def __init__(self, uri):
         super(URI, self).__init__()
 
-        self['schema'], uri = splittype(uri)
+        self.schema, uri = splittype(uri)
 
-        uri, self['database'] = splithost(uri)
-        self['database'] = self['database'][1:]
+        uri, self['db'] = splithost(uri)
+        self['db'] = self['db'][1:]
 
         userpass, hostport = splituser(uri)
         if userpass:

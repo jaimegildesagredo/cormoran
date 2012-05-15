@@ -10,17 +10,17 @@ class TestURI(unittest.TestCase):
     def test_schema(self):
         uri = URI('sqlite://')
 
-        assert_that(uri['schema'], is_('sqlite'))
+        assert_that(uri.schema, is_('sqlite'))
 
-    def test_database(self):
+    def test_db(self):
         uri = URI('sqlite:///database')
 
-        assert_that(uri['database'], is_('database'))
+        assert_that(uri['db'], is_('database'))
 
-    def test_database_is_empty(self):
+    def test_db_is_empty(self):
         uri = URI('sqlite:///')
 
-        assert_that(uri['database'], is_(''))
+        assert_that(uri['db'], is_(''))
 
     def test_user(self):
         uri = URI('mysql://username@')
@@ -55,8 +55,9 @@ class TestURI(unittest.TestCase):
     def test_uri(self):
         uri = URI('mysql://username:password@hostname:1234/database')
 
-        assert_that(uri['schema'], is_('mysql'))
-        assert_that(uri['database'], is_('database'))
+        assert_that(uri.schema, is_('mysql'))
+
+        assert_that(uri['db'], is_('database'))
         assert_that(uri['user'], is_('username'))
         assert_that(uri['passwd'], is_('password'))
         assert_that(uri['host'], is_('hostname'))
