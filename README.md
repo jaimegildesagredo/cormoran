@@ -32,6 +32,19 @@ store.add(Task(summary='foo'))
 store.commit()
 ```
 
+# Testing
+To run the test suite you need to install some dependencies. For this I
+recommend you to use a Python virtualenv.
+
+    $ cd cormoran
+    $ virtualenv env
+    $ source env/bin/activate
+    $ pip install nose pydoubles pyhamcrest
+
+And now you can run the tests using nose.
+
+    $ nosetests
+
 # Source Code
 Cormoran source code is hosted on GitHub.
 
