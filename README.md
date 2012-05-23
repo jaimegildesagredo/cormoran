@@ -12,6 +12,26 @@ Also you can install and use the latest development code from GitHub using pip.
 
     $ pip install -e git+git://github.com/jaimegildesagredo/cormoran.git
 
+# Usage
+This is a simple Cormoran usage example. The commented code comes from
+a sample ToDo application using Cormoran. You can get the entire source
+code here: https://github.com/jaimegildesagredo/todo
+
+```python
+from cormoran import * # Imports the framework
+
+store = Store(connect('sqlite:///:memory:')) # Connects to a in-memory SQLite database
+
+# Defines the model
+class Task(Persistent):
+    summary = StringField()
+    done = BooleanField(default=False)
+
+# Adds a new item and commits
+store.add(Task(summary='foo'))
+store.commit()
+```
+
 # Source Code
 Cormoran source code is hosted on GitHub.
 
