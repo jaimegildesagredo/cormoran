@@ -1,4 +1,5 @@
-# Cormoran
+# Cormoran [![Build Status](https://secure.travis-ci.org/jaimegildesagredo/cormoran.png)](http://travis-ci.org/jaimegildesagredo/cormoran)
+
 Cormoran is a fast and lightweight Python persistence framework.
 Its main goal is to provide a fast and easy abstraction layer on top of
 various database banckends.
