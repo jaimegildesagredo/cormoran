@@ -46,7 +46,7 @@ And now you can run the tests using nose.
     $ nosetests
 
 # Source Code
-Cormoran source code is hosted on GitHub.
+Cormoran source code is hosted on GitHub and released under the GNU GPLv3.
 
     https://github.com/jaimegildesagredo/cormoran
 
