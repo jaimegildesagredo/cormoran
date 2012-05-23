@@ -22,6 +22,11 @@ class TestURI(unittest.TestCase):
 
         assert_that(uri['db'], is_(''))
 
+    def test_db_in_memory_sqlite(self):
+        uri = URI('sqlite:///:memory:')
+
+        assert_that(uri['db'], is_(':memory:'))
+
     def test_user(self):
         uri = URI('mysql://username@')
 
