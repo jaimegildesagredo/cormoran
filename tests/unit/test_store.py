@@ -127,6 +127,16 @@ class TestStore(unittest.TestCase):
             self.persistence, PersistentClass)
         assert_that_method(self.resultset.filter).was_called().with_args(_id=1)
 
+    def test_get_with_custom_primary_field_filters_by_its_name(self):
+        class Foo(Persistent):
+            name = StringField(primary=True)
+
+        when(self.resultset.filter).then_return([Foo()])
+
+        result = self.store.get(Foo, 'bar')
+
+        assert_that_method(self.resultset.filter).was_called().with_args(name='bar')
+
     def test_get_with_no_result_returns_none(self):
         when(self.resultset.filter).then_return([])
 

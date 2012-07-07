@@ -66,8 +66,17 @@ class Store(object):
         return self._resultset_factory(self.persistence, persistent_cls)
 
     def get(self, persistent_cls, identifier):
+        if not issubclass(persistent_cls, Persistent):
+            raise TypeError()
+
+        for key, field in persistent_cls._fields.iteritems():
+            if field is persistent_cls._id:
+                primary_field = key
+                break
+
         try:
-            return self.find(persistent_cls).filter(_id=identifier)[0]
+            return self._resultset_factory(self.persistence,
+                persistent_cls).filter(**{primary_field: identifier})[0]
         except IndexError:
             return None
 
