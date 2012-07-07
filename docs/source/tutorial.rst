@@ -29,6 +29,7 @@ Defining data
 We need to define a new :class:`Persistent` subclass with all the fields we want to persists.
 
 >>> class User(Persistent):
+...     _collection = 'users'
 ...    email = StringField(nullable=False)
 ...    name = StringField()
 ...    is_active = BooleanField(default=False)

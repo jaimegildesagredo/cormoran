@@ -55,8 +55,10 @@ class PersistentMetaclass(type):
 
         attrs['_id'] = primary.values()[0]
         attrs['_fields'] = fields
+        if not '_collection' in attrs:
+            attrs['_collection'] = name
 
-        return super_new(cls, attrs.get('__name__', name), bases, attrs)
+        return super_new(cls, name, bases, attrs)
 
 
 class Persistent(object):

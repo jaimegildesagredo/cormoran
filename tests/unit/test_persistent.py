@@ -156,11 +156,15 @@ class TestPersistent(unittest.TestCase):
 
         assert_that(another._data, has_length(0))
 
-    def test_override_collection_name(self):
-        class Foo(Persistent):
-            __name__ = 'foobar'
+    def test_default_collection_is_class_name(self):
+        assert_that(User._collection, is_(User.__name__))
 
-        assert_that(Foo.__name__, is_('foobar'))
+    def test_set_custom_collection(self):
+        class User(Persistent):
+            _collection = 'users'
+
+        assert_that(User._collection, is_('users'))
+        assert_that(User()._collection, is_('users'))
 
 
 class User(Persistent):
