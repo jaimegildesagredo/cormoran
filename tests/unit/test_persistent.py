@@ -166,6 +166,11 @@ class TestPersistent(unittest.TestCase):
         assert_that(User._collection, is_('users'))
         assert_that(User()._collection, is_('users'))
 
+    def test_with_reserved_word_field_raises_value_error(self):
+        with assert_raises(ValueError):
+            class Foo(Persistent):
+                _collection = StringField()
+
 
 class User(Persistent):
     name = StringField(name=u'username')

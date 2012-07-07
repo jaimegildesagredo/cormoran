@@ -18,6 +18,13 @@
 
 from cormoran.fields import BaseField, IntegerField
 
+_RESERVED = set([
+    '_fields',
+    '_data',
+    '_collection',
+    '_persisted'
+])
+
 
 class PersistentMetaclass(type):
     def __new__(cls, name, bases, attrs):
@@ -52,6 +59,9 @@ class PersistentMetaclass(type):
         if '_id' in fields and '_id' not in primary:
             raise ValueError('`_id` attribute can only be overridden by '
                 'a primary field.')
+
+        if _RESERVED & set(set(fields)):
+            raise ValueError()
 
         attrs['_id'] = primary.values()[0]
         attrs['_fields'] = fields
