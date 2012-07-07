@@ -56,7 +56,7 @@ class PersistentMetaclass(type):
         attrs['_id'] = primary.values()[0]
         attrs['_fields'] = fields
 
-        return super_new(cls, name, bases, attrs)
+        return super_new(cls, attrs.get('__name__', name), bases, attrs)
 
 
 class Persistent(object):

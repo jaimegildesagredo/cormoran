@@ -156,6 +156,12 @@ class TestPersistent(unittest.TestCase):
 
         assert_that(another._data, has_length(0))
 
+    def test_override_collection_name(self):
+        class Foo(Persistent):
+            __name__ = 'foobar'
+
+        assert_that(Foo.__name__, is_('foobar'))
+
 
 class User(Persistent):
     name = StringField(name=u'username')
