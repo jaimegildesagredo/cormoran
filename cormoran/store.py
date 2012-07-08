@@ -74,6 +74,8 @@ class Store(object):
                 primary_field = key
                 break
 
+        self.flush()
+
         try:
             return self._resultset_factory(self.persistence,
                 persistent_cls).filter(**{primary_field: identifier})[0]
