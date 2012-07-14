@@ -3,7 +3,7 @@
 import unittest
 from hamcrest import *
 
-from cormoran.uri import URI
+from cormoran.uri import URI, URIOptions
 
 
 class TestURI(unittest.TestCase):
@@ -56,6 +56,13 @@ class TestURI(unittest.TestCase):
         assert_that(uri['passwd'], is_('password'))
         assert_that(uri['host'], is_('hostname'))
         assert_that(uri['port'], is_(1234))
+
+    def test_query_params(self):
+        uri = URI('mysql:///database?connection_recycle=7200&foo=bar')
+
+        assert_that(uri.options.get('connection_recycle'), is_(7200))
+        assert_that(uri.options.get('foo'), is_('bar'))
+        assert_that(uri.options.get('foobar'), is_(None))
 
     def test_uri(self):
         uri = URI('mysql://username:password@hostname:1234/database')
