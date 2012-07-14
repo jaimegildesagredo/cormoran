@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import time
+import logging
 
 from cormoran.persistence import Persistence as Persistence_
 from cormoran.sql.compiler import SQLCompiler
 
 import MySQLdb as dbapi2
+
+log = logging.getLogger('cormoran.backend.mysql')
 
 
 class Persistence(Persistence_):
@@ -44,10 +47,14 @@ class Persistence(Persistence_):
         self.close()
         self._connection = dbapi2.connect(**self.uri)
 
+        log.debug('Connected to %s', self.uri['db'])
+
     def close(self):
         if self._connection is not None:
             self._connection.close()
             self._connection = None
+
+            log.debug('Connection closed', self.uri)
 
     def begin_transaction(self):
         if not self._transaction:
